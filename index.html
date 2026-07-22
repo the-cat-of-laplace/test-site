@@ -3,28 +3,341 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>测试</title>
+    <meta name="description" content="原子分子物理实验操作、技巧与经验知识库。" />
+    <title>AMP Lab · 原子分子物理操作库</title>
     <style>
-      * {
-        box-sizing: border-box;
+      :root {
+        --ink: #10221d;
+        --muted: #687872;
+        --line: #dce5e1;
+        --paper: #f4f7f5;
+        --card: #ffffff;
+        --forest: #0e3027;
+        --green: #247861;
+        --mint: #d7eee6;
+        --amber: #f5c86b;
+        --shadow: 0 18px 45px rgba(24, 52, 44, 0.08);
       }
 
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
-        display: grid;
-        min-height: 100vh;
         margin: 0;
-        place-items: center;
-        background: #fff;
-        color: #111;
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
       }
+      button, input { font: inherit; }
+      button, a { -webkit-tap-highlight-color: transparent; }
 
-      main {
-        font-size: 2rem;
+      .app { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 30px 22px;
+        color: #f3faf7;
+        background:
+          radial-gradient(circle at 10% 8%, rgba(63, 158, 128, .24), transparent 30%),
+          var(--forest);
+        display: flex;
+        flex-direction: column;
+      }
+      .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 42px; }
+      .brand-mark {
+        width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.24);
+        border-radius: 13px; display: grid; place-items: center; position: relative;
+      }
+      .brand-mark::before, .brand-mark::after {
+        content: ""; position: absolute; border: 1px solid #7fd1b5; border-radius: 50%;
+        width: 25px; height: 11px; transform: rotate(35deg);
+      }
+      .brand-mark::after { transform: rotate(-35deg); }
+      .brand-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+      .brand strong { display: block; font-size: 16px; letter-spacing: .04em; }
+      .brand small { color: #9fc2b7; font-size: 11px; }
+
+      .nav-label { color: #759d91; font-size: 10px; font-weight: 700; letter-spacing: .18em; margin: 0 10px 10px; }
+      .nav { display: grid; gap: 7px; }
+      .nav button {
+        border: 0; color: #bcd2cb; background: transparent; text-align: left;
+        padding: 12px 13px; border-radius: 10px; cursor: pointer; display: flex;
+        align-items: center; gap: 11px; transition: .2s ease;
+      }
+      .nav button:hover, .nav button.active { color: #fff; background: rgba(255,255,255,.09); }
+      .nav-icon { width: 20px; text-align: center; opacity: .9; }
+      .side-note {
+        margin-top: auto; padding: 16px; border: 1px solid rgba(255,255,255,.12);
+        border-radius: 14px; background: rgba(255,255,255,.05);
+      }
+      .side-note strong { font-size: 13px; }
+      .side-note p { margin: 7px 0 0; color: #9fc2b7; font-size: 11px; line-height: 1.6; }
+
+      main { min-width: 0; }
+      .topbar {
+        height: 78px; padding: 0 5vw; display: flex; align-items: center; gap: 22px;
+        border-bottom: 1px solid var(--line); background: rgba(244,247,245,.9);
+        backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10;
+      }
+      .mobile-menu { display: none; border: 0; background: none; font-size: 22px; }
+      .search { position: relative; flex: 1; max-width: 580px; }
+      .search input {
+        width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 44px;
+        outline: none; background: #fff; color: var(--ink); transition: .2s;
+      }
+      .search input:focus { border-color: #73aa98; box-shadow: 0 0 0 3px rgba(36,120,97,.1); }
+      .search::before { content: "⌕"; position: absolute; left: 16px; top: 8px; font-size: 23px; color: var(--muted); }
+      .key { position: absolute; right: 11px; top: 9px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 6px; color: #87948f; font-size: 11px; }
+      .top-actions { margin-left: auto; display: flex; gap: 10px; }
+      .icon-btn { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 11px; background: #fff; cursor: pointer; }
+
+      .content { padding: 46px 5vw 70px; max-width: 1440px; margin: 0 auto; }
+      .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(290px, .55fr); gap: 24px; }
+      .hero-main {
+        min-height: 305px; padding: 44px; border-radius: 24px; color: #f5fbf8; overflow: hidden;
+        background: linear-gradient(125deg, #123d32 0%, #1e6753 100%); position: relative;
+        box-shadow: var(--shadow);
+      }
+      .hero-main::after {
+        content: ""; position: absolute; width: 270px; height: 270px; right: -35px; top: -40px;
+        border: 1px solid rgba(255,255,255,.15); border-radius: 50%; box-shadow:
+          0 0 0 34px rgba(255,255,255,.035), 0 0 0 76px rgba(255,255,255,.025);
+      }
+      .eyebrow { color: #a8dbc9; font-size: 12px; font-weight: 700; letter-spacing: .16em; }
+      h1 { margin: 18px 0 15px; max-width: 650px; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(34px, 4vw, 54px); line-height: 1.13; letter-spacing: -.03em; }
+      .hero-main p { max-width: 610px; color: #c9ddd6; line-height: 1.8; font-size: 14px; }
+      .hero-actions { display: flex; gap: 12px; margin-top: 28px; position: relative; z-index: 1; }
+      .primary, .secondary { border: 0; border-radius: 11px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+      .primary { color: var(--forest); background: var(--amber); }
+      .secondary { color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); }
+
+      .status-card { padding: 28px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
+      .status-card h2 { font-size: 16px; margin: 0 0 6px; }
+      .status-card > p { color: var(--muted); margin: 0 0 25px; font-size: 12px; }
+      .progress-ring {
+        width: 128px; height: 128px; margin: 0 auto 23px; border-radius: 50%; display: grid; place-items: center;
+        background: conic-gradient(var(--green) 0 18%, #e8efec 18% 100%); position: relative;
+      }
+      .progress-ring::after { content: ""; width: 101px; height: 101px; border-radius: 50%; background: #fff; position: absolute; }
+      .progress-value { position: relative; z-index: 1; text-align: center; font-size: 25px; font-weight: 800; }
+      .progress-value small { display: block; color: var(--muted); font-size: 10px; font-weight: 500; }
+      .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); padding-top: 19px; }
+      .stat { text-align: center; }
+      .stat + .stat { border-left: 1px solid var(--line); }
+      .stat strong { display: block; font-size: 17px; }
+      .stat span { color: var(--muted); font-size: 10px; }
+
+      .section { margin-top: 43px; }
+      .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+      .section-head h2 { margin: 0 0 5px; font-size: 21px; }
+      .section-head p { margin: 0; color: var(--muted); font-size: 12px; }
+      .text-btn { border: 0; background: transparent; color: var(--green); font-weight: 700; cursor: pointer; }
+      .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      .category {
+        min-height: 150px; padding: 22px; border: 1px solid var(--line); border-radius: 17px;
+        background: var(--card); cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+      }
+      .category:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #a8c8bd; }
+      .category-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; background: var(--mint); font-size: 19px; }
+      .category h3 { margin: 18px 0 5px; font-size: 15px; }
+      .category p { margin: 0; color: var(--muted); font-size: 11px; }
+
+      .library { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+      .entry { padding: 24px; border: 1px solid var(--line); border-radius: 17px; background: #fff; display: flex; gap: 18px; align-items: flex-start; }
+      .entry-num { color: #8eb1a5; font-family: Georgia, serif; font-size: 25px; }
+      .entry h3 { margin: 0 0 8px; font-size: 15px; }
+      .entry p { color: var(--muted); margin: 0; font-size: 11px; line-height: 1.65; }
+      .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 7px; }
+      .tag { background: #eef5f2; color: #3f6b5d; border-radius: 20px; padding: 5px 9px; font-size: 9px; font-weight: 700; }
+      .empty { border-style: dashed; background: transparent; align-items: center; justify-content: center; min-height: 145px; color: var(--muted); text-align: center; }
+      .empty strong { display: block; color: var(--ink); margin-bottom: 5px; }
+
+      .toast { position: fixed; right: 28px; bottom: 28px; padding: 13px 18px; color: #fff; background: var(--forest); border-radius: 11px; box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .25s; font-size: 12px; z-index: 30; }
+      .toast.show { opacity: 1; transform: translateY(0); }
+      .overlay { display: none; }
+
+      @media (max-width: 1050px) {
+        .app { grid-template-columns: 220px 1fr; }
+        .category-grid { grid-template-columns: repeat(2, 1fr); }
+        .hero { grid-template-columns: 1fr; }
+        .status-card { display: grid; grid-template-columns: 1fr 150px 1fr; align-items: center; }
+        .status-card > p { margin: 0; }
+        .progress-ring { margin: 0; }
+      }
+      @media (max-width: 760px) {
+        .app { display: block; }
+        .sidebar { position: fixed; left: -280px; z-index: 40; width: 260px; transition: .25s; }
+        .sidebar.open { left: 0; }
+        .overlay { position: fixed; inset: 0; background: rgba(7,25,20,.4); z-index: 35; }
+        .overlay.show { display: block; }
+        .mobile-menu { display: block; cursor: pointer; }
+        .topbar { padding: 0 20px; }
+        .top-actions { display: none; }
+        .content { padding: 28px 18px 50px; }
+        .hero-main { padding: 31px 26px; min-height: 330px; }
+        .hero-main::after { opacity: .5; }
+        .status-card { display: block; }
+        .status-card > p { margin-bottom: 22px; }
+        .progress-ring { margin: 0 auto 22px; }
+        .category-grid, .library { grid-template-columns: 1fr; }
+        .section-head { align-items: flex-start; }
+        .key { display: none; }
+        .search input { padding-right: 14px; }
       }
     </style>
   </head>
   <body>
-    <main>测试</main>
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark"><span class="brand-dot"></span></div>
+          <div><strong>AMP Lab</strong><small>Atomic & Molecular Physics</small></div>
+        </div>
+        <p class="nav-label">知识库</p>
+        <nav class="nav">
+          <button class="active" data-target="home"><span class="nav-icon">⌂</span>概览</button>
+          <button data-target="categories"><span class="nav-icon">◫</span>技巧分类</button>
+          <button data-target="library"><span class="nav-icon">≡</span>实验目录</button>
+          <button data-action="pending"><span class="nav-icon">☆</span>我的收藏</button>
+        </nav>
+        <p class="nav-label" style="margin-top:30px">管理</p>
+        <nav class="nav">
+          <button data-action="pending"><span class="nav-icon">＋</span>录入新技巧</button>
+          <button data-action="pending"><span class="nav-icon">⚙</span>字段设置</button>
+        </nav>
+        <div class="side-note">
+          <strong>资料待补充</strong>
+          <p>目前已完成网站结构。实验步骤、关键参数、故障排查与安全提醒将在收到资料后录入。</p>
+        </div>
+      </aside>
+      <div class="overlay" id="overlay"></div>
+
+      <main id="home">
+        <header class="topbar">
+          <button class="mobile-menu" id="menuButton" aria-label="打开菜单">☰</button>
+          <label class="search">
+            <input id="searchInput" type="search" placeholder="搜索实验、仪器、参数或技巧…" />
+            <span class="key">⌘ K</span>
+          </label>
+          <div class="top-actions">
+            <button class="icon-btn" data-action="pending" aria-label="通知">◌</button>
+            <button class="icon-btn" data-action="pending" aria-label="帮助">?</button>
+          </div>
+        </header>
+
+        <div class="content">
+          <section class="hero">
+            <div class="hero-main">
+              <span class="eyebrow">ATOMIC & MOLECULAR PHYSICS</span>
+              <h1>把实验经验，变成可复用的操作知识。</h1>
+              <p>集中整理原子分子物理实验中的操作流程、仪器调节、参数经验与故障排查，让每一次调试都有迹可循。</p>
+              <div class="hero-actions">
+                <button class="primary" data-target="library">浏览实验库</button>
+                <button class="secondary" data-action="pending">录入一条技巧</button>
+              </div>
+            </div>
+            <aside class="status-card">
+              <div><h2>知识库完成度</h2><p>外围结构已就绪，等待实验资料录入</p></div>
+              <div class="progress-ring"><div class="progress-value">18%<small>框架阶段</small></div></div>
+              <div class="stats">
+                <div class="stat"><strong>4</strong><span>分类</span></div>
+                <div class="stat"><strong>2</strong><span>模板</span></div>
+                <div class="stat"><strong>0</strong><span>正式条目</span></div>
+              </div>
+            </aside>
+          </section>
+
+          <section class="section" id="categories">
+            <div class="section-head">
+              <div><h2>技巧分类</h2><p>按实验工作的实际场景组织知识，而不是按论文目录堆放。</p></div>
+              <button class="text-btn" data-action="pending">管理分类 →</button>
+            </div>
+            <div class="category-grid">
+              <article class="category" data-search="真空系统 抽气 检漏 烘烤">
+                <div class="category-icon">◉</div><h3>真空系统</h3><p>抽气、检漏、烘烤与压力异常</p>
+              </article>
+              <article class="category" data-search="激光 光路 调节 锁频 光纤">
+                <div class="category-icon">⌁</div><h3>激光与光路</h3><p>准直、耦合、锁频与光路稳定</p>
+              </article>
+              <article class="category" data-search="原子 分子 制备 冷却 囚禁">
+                <div class="category-icon">✣</div><h3>原子分子制备</h3><p>装载、冷却、囚禁与态制备</p>
+              </article>
+              <article class="category" data-search="探测 数据 采集 成像 标定">
+                <div class="category-icon">▦</div><h3>探测与采集</h3><p>成像、信号采集、标定与噪声</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="section" id="library">
+            <div class="section-head">
+              <div><h2>实验操作库</h2><p>下面是内容模板，正式条目将在你提供资料后替换。</p></div>
+              <button class="text-btn" data-action="pending">查看全部 →</button>
+            </div>
+            <div class="library" id="entryList">
+              <article class="entry" data-search="标准实验条目 操作流程 参数 安全">
+                <span class="entry-num">01</span>
+                <div><h3>标准实验条目模板</h3><p>用于记录实验目的、准备条件、逐步操作、关键参数、判断标准、安全提示与常见问题。</p><div class="tags"><span class="tag">待填充</span><span class="tag">操作流程</span><span class="tag">安全</span></div></div>
+              </article>
+              <article class="entry" data-search="故障排查 问题 现象 原因 处理">
+                <span class="entry-num">02</span>
+                <div><h3>故障排查条目模板</h3><p>从可观察现象出发，记录可能原因、排查顺序、确认方法及恢复操作，减少重复试错。</p><div class="tags"><span class="tag">待填充</span><span class="tag">Troubleshooting</span></div></div>
+              </article>
+              <article class="entry empty" data-search="待补充">
+                <div><strong>＋ 等待第一条实验资料</strong><span>你可以直接发文字、表格、照片或现有笔记</span></div>
+              </article>
+              <article class="entry empty" data-search="待补充">
+                <div><strong>资料会被结构化整理</strong><span>我会统一术语、层级、标签和注意事项</span></div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast">该功能将在内容录入阶段启用</div>
+
+    <script>
+      const sidebar = document.querySelector('#sidebar');
+      const overlay = document.querySelector('#overlay');
+      const toast = document.querySelector('#toast');
+      const searchInput = document.querySelector('#searchInput');
+      const searchable = [...document.querySelectorAll('[data-search]')];
+
+      function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(window.toastTimer);
+        window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      document.querySelector('#menuButton').addEventListener('click', () => {
+        sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+      });
+      overlay.addEventListener('click', closeMenu);
+
+      document.addEventListener('click', (event) => {
+        const targetButton = event.target.closest('[data-target]');
+        const pendingButton = event.target.closest('[data-action="pending"]');
+        if (targetButton) {
+          document.querySelectorAll('.nav button').forEach(btn => btn.classList.toggle('active', btn === targetButton));
+          document.querySelector(`#${targetButton.dataset.target}`)?.scrollIntoView({ behavior: 'smooth' });
+          closeMenu();
+        }
+        if (pendingButton) showToast('外围已预留，等资料确认后启用');
+      });
+
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim().toLowerCase();
+        searchable.forEach(item => {
+          item.style.display = !query || `${item.dataset.search} ${item.textContent}`.toLowerCase().includes(query) ? '' : 'none';
+        });
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+          event.preventDefault(); searchInput.focus();
+        }
+      });
+    </script>
   </body>
 </html>
