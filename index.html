@@ -3,385 +3,1296 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="原子分子物理实验操作、技巧与经验知识库。" />
-    <title>精测 · AMO Lab | 原子分子物理实验操作库</title>
+    <meta
+      name="description"
+      content="面向原子分子光物理实验的学生操作知识库，整理激光器启停、光路准直与实验经验。"
+    />
+    <title>精测院 AMO Lab | 原子分子物理实验操作库</title>
     <style>
       :root {
-        --ink: #15201d;
-        --muted: #65716d;
-        --line: #d9e1de;
-        --paper: #f5f7f6;
+        --ink: #17211e;
+        --muted: #64716c;
+        --line: #d9e2df;
+        --paper: #f3f6f5;
         --card: #ffffff;
-        --forest: #102d27;
-        --green: #176c57;
-        --mint: #dff1eb;
-        --amber: #e8b44e;
-        --blue: #426bba;
-        --coral: #c55f4f;
-        --shadow: 0 12px 32px rgba(23, 48, 41, 0.08);
+        --forest: #113c32;
+        --forest-deep: #0d2b25;
+        --green: #1f765f;
+        --green-soft: #dcefe8;
+        --blue: #376dc2;
+        --blue-soft: #e7eefb;
+        --amber: #e4b54d;
+        --amber-soft: #fff3d9;
+        --coral: #c85e4a;
+        --coral-soft: #f9e9e5;
+        --shadow: 0 12px 30px rgba(22, 42, 36, 0.07);
       }
 
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
-        background-color: var(--paper);
-        background-image: linear-gradient(rgba(28, 72, 60, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(28, 72, 60, .025) 1px, transparent 1px);
-        background-size: 28px 28px;
         color: var(--ink);
+        background-color: var(--paper);
+        background-image:
+          linear-gradient(rgba(21, 66, 54, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(21, 66, 54, 0.025) 1px, transparent 1px);
+        background-size: 30px 30px;
         font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
       }
       button, input { font: inherit; }
-      button, a { -webkit-tap-highlight-color: transparent; }
+      button, a, summary { -webkit-tap-highlight-color: transparent; }
+      button { color: inherit; }
+      button:focus-visible, input:focus-visible, summary:focus-visible {
+        outline: 3px solid rgba(55, 109, 194, 0.28);
+        outline-offset: 2px;
+      }
+      .hidden { display: none !important; }
 
-      .app { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+      body.is-locked { overflow: hidden; background: var(--forest-deep); }
+      body.is-locked .app-shell,
+      body.is-locked .toast { display: none; }
+      .access-gate {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: none;
+        place-items: center;
+        padding: 28px;
+        overflow: auto;
+        background-color: var(--forest-deep);
+        background-image:
+          linear-gradient(rgba(151, 197, 182, 0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(151, 197, 182, 0.045) 1px, transparent 1px);
+        background-size: 34px 34px;
+      }
+      body.is-locked .access-gate { display: grid; }
+      .gate-shell {
+        width: min(880px, 100%);
+        min-height: 500px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 24px 70px rgba(3, 19, 15, 0.34);
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+      }
+      .gate-side {
+        min-width: 0;
+        padding: 40px;
+        color: #eef8f4;
+        background: var(--forest);
+        border-top: 4px solid var(--amber);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+      .gate-brand { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
+      .gate-brand strong { display: block; font-size: 16px; }
+      .gate-brand small { color: #9fc2b7; font-size: 10px; }
+      .gate-institute { margin-top: auto; position: relative; z-index: 2; }
+      .gate-institute span { color: #8fb3a8; font-size: 10px; font-weight: 750; }
+      .gate-institute p {
+        max-width: 280px;
+        margin: 7px 0 0;
+        font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+        font-size: 21px;
+        line-height: 1.45;
+      }
+      .gate-atom {
+        position: absolute;
+        right: -55px;
+        top: 105px;
+        width: 260px;
+        height: 220px;
+        opacity: 0.55;
+      }
+      .gate-orbit {
+        position: absolute;
+        left: 28px;
+        top: 78px;
+        width: 205px;
+        height: 70px;
+        border: 1px solid rgba(173, 220, 204, 0.5);
+        border-radius: 50%;
+      }
+      .gate-orbit.two { transform: rotate(60deg); }
+      .gate-orbit.three { transform: rotate(-60deg); }
+      .gate-core {
+        position: absolute;
+        left: 116px;
+        top: 98px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 28px rgba(228, 181, 77, 0.58);
+      }
+      .gate-panel {
+        padding: 48px;
+        background: #ffffff;
+        display: grid;
+        place-items: center;
+      }
+      .gate-form { width: min(100%, 360px); }
+      .gate-kicker { margin: 0; color: var(--blue); font-size: 10px; font-weight: 800; }
+      .gate-form h2 { margin: 10px 0 8px; font-size: 28px; }
+      .gate-copy { margin: 0 0 28px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+      .gate-form label { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 750; }
+      .gate-form input {
+        width: 100%;
+        height: 44px;
+        padding: 0 13px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        outline: none;
+        color: var(--ink);
+        background: #fbfcfc;
+      }
+      .gate-form input:focus { border-color: #72a594; box-shadow: 0 0 0 3px rgba(31, 118, 95, 0.1); }
+      .gate-submit {
+        width: 100%;
+        min-height: 44px;
+        margin-top: 12px;
+        border: 1px solid var(--forest);
+        border-radius: 6px;
+        color: #ffffff;
+        background: var(--forest);
+        cursor: pointer;
+        font-weight: 750;
+      }
+      .gate-submit:hover { background: #174c40; }
+      .gate-submit:disabled { opacity: 0.62; cursor: wait; }
+      .gate-error { min-height: 20px; margin: 9px 0 0; color: var(--coral); font-size: 11px; }
+      .gate-note { margin: 22px 0 0; padding-top: 16px; border-top: 1px solid var(--line); color: #7b8782; font-size: 10px; }
+
+      .app-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 248px minmax(0, 1fr);
+      }
+
       .sidebar {
         position: sticky;
         top: 0;
+        z-index: 40;
         height: 100vh;
-        padding: 30px 22px;
-        color: #f3faf7;
-        background:
-          radial-gradient(circle at 10% 8%, rgba(63, 158, 128, .24), transparent 30%),
-          var(--forest);
+        padding: 26px 20px 22px;
+        color: #eef8f4;
+        background: var(--forest-deep);
+        border-top: 4px solid var(--amber);
         display: flex;
         flex-direction: column;
       }
-      .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 42px; }
-      .brand-mark {
-        width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.24);
-        border-radius: 8px; display: grid; place-items: center; position: relative;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
       }
-      .brand-mark::before, .brand-mark::after {
-        content: ""; position: absolute; border: 1px solid #7fd1b5; border-radius: 50%;
-        width: 25px; height: 11px; transform: rotate(35deg);
+      .brand-symbol {
+        width: 46px;
+        height: 46px;
+        flex: 0 0 46px;
+        border-radius: 6px;
+        background: #f7fbf9;
+        color: var(--forest-deep);
+        display: grid;
+        place-items: center;
+        font-family: Georgia, serif;
+        font-size: 14px;
+        font-weight: 800;
+        position: relative;
+        overflow: hidden;
       }
-      .brand-mark::after { transform: rotate(-35deg); }
-      .brand-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
-      .brand strong { display: block; font-size: 16px; letter-spacing: 0; }
-      .brand small { color: #9fc2b7; font-size: 11px; }
-
-      .nav-label { color: #759d91; font-size: 10px; font-weight: 700; letter-spacing: 0; margin: 0 10px 10px; }
-      .nav { display: grid; gap: 7px; }
+      .brand-symbol::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--blue) 0 45%, var(--amber) 45% 72%, var(--coral) 72%);
+      }
+      .brand-copy strong { display: block; font-size: 16px; }
+      .brand-copy small { color: #9fc2b7; font-size: 11px; }
+      .institute-block {
+        margin: 24px 0 34px;
+        padding-left: 12px;
+        border-left: 2px solid #5a8bd4;
+      }
+      .institute-block span {
+        display: block;
+        color: #8fb3a8;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .institute-block p {
+        margin: 5px 0 7px;
+        color: #e8f3ef;
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      .institute-block small { color: #789f93; font-size: 10px; }
+      .nav-label {
+        margin: 0 10px 9px;
+        color: #71988d;
+        font-size: 10px;
+        font-weight: 800;
+      }
+      .nav { display: grid; gap: 5px; }
+      .nav + .nav-label { margin-top: 27px; }
       .nav button {
-        border: 0; color: #bcd2cb; background: transparent; text-align: left;
-        padding: 12px 13px; border-radius: 7px; cursor: pointer; display: flex;
-        align-items: center; gap: 11px; transition: .2s ease;
+        width: 100%;
+        min-height: 42px;
+        padding: 9px 12px;
+        border: 0;
+        border-radius: 6px;
+        color: #b9d0c9;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        text-align: left;
+        transition: background-color 0.18s ease, color 0.18s ease;
       }
-      .nav button:hover, .nav button.active { color: #fff; background: rgba(255,255,255,.09); }
-      .nav-icon { width: 20px; text-align: center; opacity: .9; }
-      .side-note {
-        margin-top: auto; padding: 16px; border: 1px solid rgba(255,255,255,.12);
-        border-radius: 8px; background: rgba(255,255,255,.05);
+      .nav button:hover,
+      .nav button.active,
+      .nav button[aria-pressed="true"] {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.09);
       }
-      .side-note strong { font-size: 13px; }
-      .side-note p { margin: 7px 0 0; color: #9fc2b7; font-size: 11px; line-height: 1.6; }
+      .nav-icon {
+        width: 20px;
+        flex: 0 0 20px;
+        color: #84b9a8;
+        font-size: 16px;
+        text-align: center;
+      }
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+      }
+      .sidebar-footer strong { display: block; font-size: 13px; }
+      .sidebar-footer p {
+        margin: 6px 0 0;
+        color: #88aa9f;
+        font-size: 11px;
+        line-height: 1.6;
+      }
 
       main { min-width: 0; }
       .topbar {
-        height: 78px; padding: 0 5vw; display: flex; align-items: center; gap: 22px;
-        border-bottom: 1px solid var(--line); background: rgba(244,247,245,.9);
-        backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10;
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        height: 72px;
+        padding: 0 4vw;
+        border-bottom: 1px solid var(--line);
+        background: rgba(246, 248, 247, 0.94);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        gap: 20px;
       }
-      .mobile-menu { display: none; border: 0; background: none; font-size: 22px; }
-      .search { position: relative; flex: 1; max-width: 580px; }
-      .search input {
-        width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 12px 44px;
-        outline: none; background: #fff; color: var(--ink); transition: .2s;
+      .mobile-menu {
+        display: none;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        font-size: 22px;
       }
-      .search input:focus { border-color: #73aa98; box-shadow: 0 0 0 3px rgba(36,120,97,.1); }
-      .search::before { content: "⌕"; position: absolute; left: 16px; top: 8px; font-size: 23px; color: var(--muted); }
-      .key { position: absolute; right: 11px; top: 9px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 5px; color: #87948f; font-size: 11px; }
-      .top-actions { margin-left: auto; display: flex; gap: 10px; }
-      .identity-pill { margin-left: auto; padding: 7px 11px; border-left: 3px solid var(--blue); color: #40524c; background: #fff; font-size: 11px; font-weight: 700; }
-      .icon-btn { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; }
-
-      .content { padding: 46px 5vw 70px; max-width: 1440px; margin: 0 auto; }
-      .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(290px, .55fr); gap: 24px; }
-      .hero-main {
-        min-height: 330px; padding: 44px; border-radius: 8px; color: #f5fbf8; overflow: hidden;
-        background: #123b31; position: relative;
-        box-shadow: var(--shadow);
+      .search {
+        position: relative;
+        width: min(560px, 52vw);
       }
-      .hero-main::after {
-        content: ""; position: absolute; inset: 0;
-        background: linear-gradient(90deg, transparent 0 55%, rgba(81, 129, 203, .16)), repeating-linear-gradient(0deg, transparent 0 39px, rgba(255,255,255,.035) 40px);
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        color: #78847f;
+        font-size: 20px;
+        transform: translateY(-53%);
         pointer-events: none;
       }
-      .hero-copy { width: min(67%, 660px); position: relative; z-index: 2; }
-      .eyebrow { color: #a8dbc9; font-size: 12px; font-weight: 700; letter-spacing: 0; }
-      h1 { margin: 18px 0 15px; max-width: 650px; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(34px, 4vw, 52px); line-height: 1.13; letter-spacing: 0; }
-      .hero-main p { max-width: 610px; color: #c9ddd6; line-height: 1.8; font-size: 14px; }
-      .hero-actions { display: flex; gap: 12px; margin-top: 28px; position: relative; z-index: 1; }
-      .primary, .secondary { border: 0; border-radius: 7px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
-      .primary { color: var(--forest); background: var(--amber); }
-      .secondary { color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); }
-
-      .status-card { padding: 28px; border-radius: 8px; background: var(--card); box-shadow: var(--shadow); }
-      .orbit-visual { position: absolute; z-index: 2; right: 36px; top: 50%; width: 220px; height: 220px; transform: translateY(-50%); }
-      .orbit { position: absolute; inset: 43px 8px; border: 1px solid rgba(168,219,201,.45); border-radius: 50%; transform: rotate(28deg); }
-      .orbit:nth-child(2) { transform: rotate(-28deg); }
-      .orbit:nth-child(3) { transform: rotate(90deg) scale(.78); }
-      .nucleus { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 35px rgba(232,180,78,.55); transform: translate(-50%,-50%); }
-      .electron { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #8cb4ff; box-shadow: 0 0 18px #8cb4ff; }
-      .electron.one { left: 14px; top: 103px; } .electron.two { right: 17px; top: 64px; } .electron.three { left: 104px; bottom: 10px; }
-      .beam { position: absolute; left: -35px; right: -20px; top: 108px; height: 2px; background: linear-gradient(90deg, transparent, #e96a58 24%, #f3c363 76%, transparent); box-shadow: 0 0 10px rgba(233,106,88,.65); transform: rotate(-10deg); }
-      .status-card h2 { font-size: 16px; margin: 0 0 6px; }
-      .status-card > p { color: var(--muted); margin: 0 0 25px; font-size: 12px; }
-      .progress-ring {
-        width: 128px; height: 128px; margin: 0 auto 23px; border-radius: 50%; display: grid; place-items: center;
-        background: conic-gradient(var(--green) 0 18%, #e8efec 18% 100%); position: relative;
+      .search input {
+        width: 100%;
+        height: 42px;
+        padding: 0 54px 0 42px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        outline: none;
+        color: var(--ink);
+        background: #ffffff;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
       }
-      .progress-ring::after { content: ""; width: 101px; height: 101px; border-radius: 50%; background: #fff; position: absolute; }
-      .progress-value { position: relative; z-index: 1; text-align: center; font-size: 25px; font-weight: 800; }
-      .progress-value small { display: block; color: var(--muted); font-size: 10px; font-weight: 500; }
-      .stats { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); padding-top: 19px; }
-      .stat { text-align: center; }
-      .stat + .stat { border-left: 1px solid var(--line); }
-      .stat strong { display: block; font-size: 17px; }
-      .stat span { color: var(--muted); font-size: 10px; }
+      .search input:focus {
+        border-color: #7aa999;
+        box-shadow: 0 0 0 3px rgba(31, 118, 95, 0.1);
+      }
+      .search-key {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        padding: 3px 6px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: #7d8984;
+        background: #f8faf9;
+        font-size: 10px;
+      }
+      .top-institute {
+        min-width: 0;
+        margin-left: auto;
+        padding-left: 13px;
+        border-left: 3px solid var(--blue);
+      }
+      .top-institute span,
+      .top-institute strong {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .top-institute span { color: var(--muted); font-size: 9px; }
+      .top-institute strong { max-width: 320px; font-size: 11px; }
 
-      .section { margin-top: 43px; }
-      .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
-      .section-head h2 { margin: 0 0 5px; font-size: 21px; }
-      .section-head p { margin: 0; color: var(--muted); font-size: 12px; }
-      .text-btn { border: 0; background: transparent; color: var(--green); font-weight: 700; cursor: pointer; }
-      .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      .hero-band {
+        color: #f3faf7;
+        background: var(--forest);
+        border-bottom: 1px solid #0a2c24;
+        overflow: hidden;
+      }
+      .hero-inner {
+        width: min(100%, 1320px);
+        min-height: 334px;
+        margin: 0 auto;
+        padding: 46px 4vw 34px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        align-items: center;
+        gap: 44px;
+      }
+      .hero-copy { min-width: 0; position: relative; z-index: 2; }
+      .eyebrow {
+        margin: 0;
+        color: #abd7c8;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      h1 {
+        margin: 15px 0 16px;
+        font-family: "Songti SC", "STSong", "Noto Serif SC", Georgia, serif;
+        font-size: 48px;
+        line-height: 1.12;
+        font-weight: 700;
+      }
+      h1 span { display: block; white-space: nowrap; }
+      .hero-copy > p {
+        max-width: 690px;
+        margin: 0;
+        color: #c9ded7;
+        font-size: 14px;
+        line-height: 1.85;
+      }
+      .hero-actions {
+        margin-top: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .primary-btn,
+      .secondary-btn,
+      .tool-btn,
+      .text-btn {
+        min-height: 40px;
+        border-radius: 6px;
+        font-weight: 750;
+        cursor: pointer;
+        transition: transform 0.16s ease, background-color 0.16s ease, border-color 0.16s ease;
+      }
+      .primary-btn:hover,
+      .secondary-btn:hover,
+      .tool-btn:hover { transform: translateY(-1px); }
+      .primary-btn {
+        padding: 0 17px;
+        border: 1px solid var(--amber);
+        color: var(--forest-deep);
+        background: var(--amber);
+      }
+      .secondary-btn {
+        padding: 0 16px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .hero-visual {
+        min-height: 235px;
+        position: relative;
+      }
+      .atom-stage {
+        position: absolute;
+        top: 0;
+        right: 22px;
+        width: 235px;
+        height: 225px;
+      }
+      .orbit {
+        position: absolute;
+        left: 17px;
+        top: 76px;
+        width: 200px;
+        height: 75px;
+        border: 1px solid rgba(173, 220, 204, 0.48);
+        border-radius: 50%;
+      }
+      .orbit.two { transform: rotate(60deg); }
+      .orbit.three { transform: rotate(-60deg); }
+      .nucleus {
+        position: absolute;
+        left: 103px;
+        top: 99px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--amber);
+        box-shadow: 0 0 28px rgba(228, 181, 77, 0.58);
+        animation: nucleusPulse 2.6s ease-in-out infinite;
+      }
+      .electron {
+        position: absolute;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #8cb4ff;
+        box-shadow: 0 0 14px rgba(140, 180, 255, 0.9);
+      }
+      .electron.one { left: 17px; top: 108px; }
+      .electron.two { right: 42px; top: 47px; }
+      .electron.three { right: 38px; bottom: 40px; }
+      .laser-beam {
+        position: absolute;
+        left: -18px;
+        right: -24px;
+        top: 113px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #ee715f 18%, #f4cf72 73%, transparent);
+        box-shadow: 0 0 9px rgba(238, 113, 95, 0.7);
+        transform: rotate(-8deg);
+      }
+      .readouts {
+        position: absolute;
+        right: 0;
+        bottom: 3px;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      .readout {
+        padding: 8px 8px 7px;
+        border-top: 2px solid #6d9ee8;
+        background: rgba(5, 28, 22, 0.48);
+      }
+      .readout:nth-child(2) { border-color: var(--amber); }
+      .readout:nth-child(3) { border-color: #e97865; }
+      .readout small,
+      .readout strong { display: block; }
+      .readout small { color: #92b8ac; font-size: 8px; }
+      .readout strong { margin-top: 3px; color: #ffffff; font-size: 12px; }
+
+      .status-strip {
+        width: min(100%, 1320px);
+        margin: 0 auto;
+        padding: 18px 4vw 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) repeat(3, minmax(92px, 130px));
+        align-items: center;
+        gap: 20px;
+      }
+      .progress-block {
+        min-width: 0;
+      }
+      .progress-copy span { display: block; color: #9fc5b8; font-size: 9px; }
+      .progress-copy strong { display: block; margin-top: 3px; font-size: 15px; }
+      .metric {
+        min-height: 38px;
+        padding-left: 18px;
+        border-left: 1px solid rgba(255, 255, 255, 0.14);
+      }
+      .metric strong,
+      .metric span { display: block; }
+      .metric strong { font-size: 18px; }
+      .metric span { margin-top: 2px; color: #9fc5b8; font-size: 9px; }
+
+      .content {
+        width: min(100%, 1320px);
+        margin: 0 auto;
+        padding: 42px 4vw 70px;
+      }
+      .section + .section { margin-top: 48px; }
+      .section-head {
+        margin-bottom: 18px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .section-head h2 { margin: 0 0 5px; font-size: 22px; }
+      .section-head p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+      .text-btn {
+        min-height: 36px;
+        padding: 0 6px;
+        border: 0;
+        color: var(--green);
+        background: transparent;
+      }
+      .category-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
       .category {
-        min-height: 150px; padding: 22px; border: 1px solid var(--line); border-radius: 8px;
-        background: var(--card); cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+        min-width: 0;
+        min-height: 142px;
+        padding: 19px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        background: var(--card);
+        cursor: pointer;
+        text-align: left;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
       }
-      .category:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #a8c8bd; }
-      .category-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 7px; background: var(--mint); font-size: 19px; }
-      .category:nth-child(2) .category-icon { background: #e5ecfa; color: var(--blue); }
-      .category:nth-child(3) .category-icon { background: #fff0df; color: #a56a18; }
-      .category:nth-child(4) .category-icon { background: #f8e8e5; color: var(--coral); }
-      .category h3 { margin: 18px 0 5px; font-size: 15px; }
-      .category p { margin: 0; color: var(--muted); font-size: 11px; }
+      .category:hover {
+        border-color: #a7c7bc;
+        box-shadow: var(--shadow);
+        transform: translateY(-3px);
+      }
+      .category[aria-pressed="true"] {
+        border-color: var(--green);
+        box-shadow: inset 0 0 0 1px var(--green), var(--shadow);
+      }
+      .category-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .category-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--green);
+        background: var(--green-soft);
+        font-size: 19px;
+      }
+      .category:nth-child(2) .category-icon { color: var(--blue); background: var(--blue-soft); }
+      .category:nth-child(3) .category-icon { color: #a36b19; background: var(--amber-soft); }
+      .category:nth-child(4) .category-icon { color: var(--coral); background: var(--coral-soft); }
+      .category-count { color: #78857f; font-size: 10px; font-weight: 750; }
+      .category-title { display: block; margin: 15px 0 5px; font-size: 15px; font-weight: 750; }
+      .category-description { display: block; margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
 
-      .library { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
-      .entry { padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #fff; display: flex; gap: 18px; align-items: flex-start; }
-      .entry-num { color: #8eb1a5; font-family: Georgia, serif; font-size: 25px; }
-      .entry h3 { margin: 0 0 8px; font-size: 15px; }
-      .entry p { color: var(--muted); margin: 0; font-size: 11px; line-height: 1.65; }
-      .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 7px; }
-      .tag { background: #eef5f2; color: #3f6b5d; border-radius: 20px; padding: 5px 9px; font-size: 9px; font-weight: 700; }
-      .procedure { grid-column: 1 / -1; display: grid; grid-template-columns: 54px 1fr; }
-      .procedure details { margin-top: 17px; border-top: 1px solid var(--line); padding-top: 15px; }
-      .procedure summary { cursor: pointer; color: var(--green); font-size: 12px; font-weight: 800; }
-      .procedure-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 15px; }
-      .step-group { padding: 8px 17px; border-left: 2px solid #c5d7d1; background: transparent; }
-      .step-group h4 { margin: 0 0 11px; font-size: 12px; }
-      .step-group ol, .step-group ul { margin: 0; padding-left: 20px; color: #4f625b; font-size: 11px; line-height: 1.8; }
-      .step-group li + li { margin-top: 5px; }
-      .caution { border-left: 3px solid var(--amber); background: #fff8e9; }
-      .pending-field { color: #8a6115; font-weight: 700; }
-      .empty { border-style: dashed; background: transparent; align-items: center; justify-content: center; min-height: 145px; color: var(--muted); text-align: center; }
-      .empty strong { display: block; color: var(--ink); margin-bottom: 5px; }
+      .library-head { align-items: center; }
+      .library-tools {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .result-count { margin-right: 4px; color: var(--muted); font-size: 11px; }
+      .tool-btn {
+        min-height: 38px;
+        padding: 0 12px;
+        border: 1px solid var(--line);
+        color: #43534d;
+        background: #ffffff;
+      }
+      .tool-btn:disabled { opacity: 0.48; cursor: default; transform: none; }
+      .filter-summary {
+        min-height: 28px;
+        margin: -6px 0 13px;
+        color: #4a5c56;
+        font-size: 11px;
+      }
+      .filter-summary strong { color: var(--green); }
+      .library { display: grid; gap: 15px; }
+      .entry {
+        padding: 23px 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+        box-shadow: 0 4px 18px rgba(27, 51, 44, 0.035);
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 16px;
+      }
+      .entry-num {
+        color: #86a99e;
+        font-family: Georgia, serif;
+        font-size: 25px;
+        line-height: 1;
+      }
+      .entry-main { min-width: 0; }
+      .entry-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+      .entry-title { min-width: 0; }
+      .entry-title h3 { margin: 0 0 7px; font-size: 16px; }
+      .entry-title p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+      .entry-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 7px; }
+      .favorite-btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        color: #7b8782;
+        background: #ffffff;
+        cursor: pointer;
+        font-size: 20px;
+      }
+      .favorite-btn[aria-pressed="true"] { color: #a96e0f; border-color: #e5c67d; background: #fff9eb; }
+      .tags { margin-top: 13px; display: flex; flex-wrap: wrap; gap: 6px; }
+      .tag {
+        padding: 4px 8px;
+        border-radius: 12px;
+        color: #40675a;
+        background: #edf5f2;
+        font-size: 10px;
+        font-weight: 750;
+      }
+      .entry details {
+        margin-top: 17px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .entry summary {
+        min-height: 30px;
+        color: var(--green);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 800;
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .entry summary::-webkit-details-marker { display: none; }
+      .entry summary::after {
+        content: "+";
+        width: 28px;
+        height: 28px;
+        flex: 0 0 28px;
+        border: 1px solid #cddbd6;
+        border-radius: 50%;
+        color: #5a7169;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .entry details[open] summary::after { content: "−"; }
+      .procedure-body {
+        margin-top: 15px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 22px;
+      }
+      .step-group {
+        padding: 3px 0 3px 16px;
+        border-left: 2px solid #bfd5cd;
+      }
+      .step-group.shutdown { border-left-color: var(--amber); }
+      .step-group h4 { margin: 0 0 10px; font-size: 12px; }
+      .step-group ol {
+        margin: 0;
+        padding-left: 20px;
+        color: #455751;
+        font-size: 13px;
+        line-height: 1.75;
+      }
+      .step-group li + li { margin-top: 7px; }
+      .no-results {
+        padding: 38px 20px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        color: var(--muted);
+        text-align: center;
+      }
+      .no-results strong { display: block; margin-bottom: 6px; color: var(--ink); }
+      .contribution-band {
+        margin-top: 18px;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      .contribution-band strong { display: block; font-size: 13px; }
+      .contribution-band p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+      .page-footer {
+        margin-top: 44px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        color: #7b8782;
+        font-size: 10px;
+        line-height: 1.7;
+      }
 
-      .toast { position: fixed; right: 28px; bottom: 28px; padding: 13px 18px; color: #fff; background: var(--forest); border-radius: 11px; box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .25s; font-size: 12px; z-index: 30; }
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 60;
+        max-width: min(360px, calc(100vw - 32px));
+        padding: 12px 16px;
+        border-radius: 7px;
+        color: #ffffff;
+        background: #102f28;
+        box-shadow: 0 12px 30px rgba(8, 27, 22, 0.22);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(8px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 12px;
+      }
       .toast.show { opacity: 1; transform: translateY(0); }
       .overlay { display: none; }
 
-      @media (max-width: 1050px) {
-        .app { grid-template-columns: 220px 1fr; }
-        .category-grid { grid-template-columns: repeat(2, 1fr); }
-        .hero { grid-template-columns: 1fr; }
-        .hero-copy { width: 60%; }
-        .status-card { display: grid; grid-template-columns: 1fr 150px 1fr; align-items: center; }
-        .status-card > p { margin: 0; }
-        .progress-ring { margin: 0; }
+      @keyframes nucleusPulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 24px rgba(228, 181, 77, 0.48); }
+        50% { transform: scale(1.08); box-shadow: 0 0 34px rgba(228, 181, 77, 0.66); }
       }
-      @media (max-width: 760px) {
-        .app { display: block; }
-        .sidebar { position: fixed; left: -280px; z-index: 40; width: 260px; transition: .25s; }
+
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
+
+      @media (max-width: 1120px) {
+        .app-shell { grid-template-columns: 220px minmax(0, 1fr); }
+        .sidebar { padding-left: 16px; padding-right: 16px; }
+        .hero-inner { grid-template-columns: minmax(0, 1fr) 285px; gap: 24px; }
+        h1 { font-size: 40px; }
+        .atom-stage { right: 2px; transform: scale(0.9); transform-origin: center right; }
+        .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+
+      @media (max-width: 900px) {
+        .app-shell { display: block; }
+        .sidebar {
+          position: fixed;
+          left: -278px;
+          width: min(258px, calc(100vw - 24px));
+          transition: left 0.22s ease;
+        }
         .sidebar.open { left: 0; }
-        .overlay { position: fixed; inset: 0; background: rgba(7,25,20,.4); z-index: 35; }
+        .overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 35;
+          background: rgba(7, 25, 20, 0.46);
+        }
         .overlay.show { display: block; }
-        .mobile-menu { display: block; cursor: pointer; }
+        .mobile-menu { display: block; flex: 0 0 40px; }
         .topbar { padding: 0 20px; }
-        .top-actions, .identity-pill { display: none; }
-        .content { padding: 28px 18px 50px; }
-        .hero-main { padding: 31px 26px; min-height: 330px; }
-        .hero-copy { width: 100%; }
-        .orbit-visual { opacity: .18; right: -55px; }
-        .hero-main::after { opacity: .5; }
-        .status-card { display: block; }
-        .status-card > p { margin-bottom: 22px; }
-        .progress-ring { margin: 0 auto 22px; }
-        .category-grid, .library, .procedure-body { grid-template-columns: 1fr; }
-        .section-head { align-items: flex-start; }
-        .key { display: none; }
-        .search input { padding-right: 14px; }
+        .search { width: min(540px, 100%); flex: 1; }
+        .top-institute { display: none; }
+        .hero-inner, .status-strip, .content { padding-left: 24px; padding-right: 24px; }
+      }
+
+      @media (max-width: 700px) {
+        .access-gate { padding: 16px; }
+        .gate-shell { min-height: 0; grid-template-columns: 1fr; }
+        .gate-side { min-height: 150px; padding: 24px; }
+        .gate-institute { margin-top: 30px; }
+        .gate-institute p { max-width: none; font-size: 17px; }
+        .gate-atom { display: none; }
+        .gate-panel { padding: 32px 24px; }
+        .hero-inner {
+          min-height: 0;
+          padding-top: 34px;
+          padding-bottom: 27px;
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        h1 { font-size: 35px; }
+        .hero-copy > p { font-size: 13px; }
+        .hero-visual { min-height: 56px; }
+        .atom-stage { display: none; }
+        .readouts { position: static; }
+        .status-strip {
+          grid-template-columns: repeat(3, minmax(62px, 1fr));
+          gap: 12px;
+        }
+        .progress-block { grid-column: 1 / -1; }
+        .metric { padding-left: 12px; }
+        .metric:nth-child(2) { border-left: 0; padding-left: 0; }
+        .section-head, .library-head { align-items: flex-start; flex-direction: column; }
+        .library-tools { width: 100%; justify-content: flex-start; }
+        .entry { grid-template-columns: 1fr; gap: 9px; padding: 19px; }
+        .entry-num { font-size: 16px; }
+        .entry-header { flex-direction: column; }
+        .entry-actions { width: 100%; }
+        .procedure-body { grid-template-columns: 1fr; }
+        .contribution-band { align-items: flex-start; flex-direction: column; }
+      }
+
+      @media (max-width: 480px) {
+        .topbar { height: 66px; padding: 0 14px; gap: 9px; }
+        .mobile-menu { width: 36px; flex-basis: 36px; }
+        .search input { height: 40px; padding-right: 12px; }
+        .search-key { display: none; }
+        .hero-inner, .status-strip, .content { padding-left: 18px; padding-right: 18px; }
+        h1 { font-size: 31px; }
+        .hero-actions { display: grid; grid-template-columns: 1fr 1fr; }
+        .primary-btn, .secondary-btn { width: 100%; padding-left: 10px; padding-right: 10px; }
+        .readout { padding-left: 6px; padding-right: 6px; }
+        .readout strong { font-size: 11px; }
+        .status-strip { padding-top: 15px; padding-bottom: 17px; }
+        .category-grid { grid-template-columns: 1fr; }
+        .category { min-height: 126px; }
+        .library-tools { align-items: stretch; }
+        .result-count { width: 100%; margin-bottom: 2px; }
+        .tool-btn { flex: 1; }
+        .entry-title h3 { font-size: 15px; }
+        .entry-actions { width: auto; }
+        .toast { right: 16px; bottom: 16px; }
+      }
+
+      @media (max-width: 360px) {
+        h1 { font-size: 28px; }
+        .hero-actions { grid-template-columns: 1fr; }
       }
     </style>
   </head>
-  <body>
-    <div class="app">
+  <body class="is-locked">
+    <section class="access-gate" id="accessGate" aria-labelledby="accessTitle">
+      <div class="gate-shell">
+        <div class="gate-side">
+          <div class="gate-brand">
+            <div class="brand-symbol" role="img" aria-label="AMO Lab 自有标记">AMO</div>
+            <div><strong>AMO Lab</strong><small>学生实验操作库</small></div>
+          </div>
+          <div class="gate-atom" aria-hidden="true">
+            <span class="gate-orbit"></span><span class="gate-orbit two"></span><span class="gate-orbit three"></span><span class="gate-core"></span>
+          </div>
+          <div class="gate-institute">
+            <span>中国科学院</span>
+            <p>精密测量科学与技术创新研究院</p>
+          </div>
+        </div>
+        <div class="gate-panel">
+          <form class="gate-form" id="accessForm">
+            <p class="gate-kicker">RESTRICTED ACCESS</p>
+            <h2 id="accessTitle">进入实验操作库</h2>
+            <p class="gate-copy">此页面仅供实验室内部学习与操作记录使用。</p>
+            <label for="accessPassword">访问密码</label>
+            <input id="accessPassword" type="password" autocomplete="current-password" required aria-describedby="accessError" />
+            <button class="gate-submit" id="accessSubmit" type="submit">进入操作库</button>
+            <p class="gate-error" id="accessError" role="alert" aria-live="polite"></p>
+            <p class="gate-note">学生整理 · 非院方正式规程或官方发布</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-shell" id="appShell" inert aria-hidden="true">
       <aside class="sidebar" id="sidebar">
         <div class="brand">
-          <div class="brand-mark"><span class="brand-dot"></span></div>
-          <div><strong>精测 · AMO Lab</strong><small>原子分子物理实验知识库</small></div>
+          <div class="brand-symbol" role="img" title="AMO Lab 自有标记" aria-label="AMO Lab 自有标记">AMO</div>
+          <div class="brand-copy">
+            <strong>AMO Lab</strong>
+            <small>原子分子光物理</small>
+          </div>
         </div>
+
+        <div class="institute-block">
+          <span>中国科学院</span>
+          <p>精密测量科学与技术创新研究院</p>
+          <small>学生整理 · 非官方发布</small>
+        </div>
+
         <p class="nav-label">知识库</p>
-        <nav class="nav">
-          <button class="active" data-target="home"><span class="nav-icon">⌂</span>概览</button>
-          <button data-target="categories"><span class="nav-icon">◫</span>技巧分类</button>
-          <button data-target="library"><span class="nav-icon">≡</span>实验目录</button>
-          <button data-action="pending"><span class="nav-icon">☆</span>我的收藏</button>
+        <nav class="nav" aria-label="知识库导航">
+          <button class="active" data-scroll="home"><span class="nav-icon">⌂</span>概览</button>
+          <button data-scroll="categories"><span class="nav-icon">◫</span>技巧分类</button>
+          <button data-scroll="library"><span class="nav-icon">≡</span>实验目录</button>
+          <button id="favoritesNav" data-action="favorites" aria-pressed="false"><span class="nav-icon">☆</span>我的收藏</button>
         </nav>
-        <p class="nav-label" style="margin-top:30px">管理</p>
-        <nav class="nav">
-          <button data-action="pending"><span class="nav-icon">＋</span>录入新技巧</button>
-          <button data-action="pending"><span class="nav-icon">⚙</span>字段设置</button>
+
+        <p class="nav-label">整理</p>
+        <nav class="nav" aria-label="内容整理">
+          <button data-action="add"><span class="nav-icon">＋</span>录入新资料</button>
+          <button data-action="fields"><span class="nav-icon">⚙</span>字段设置</button>
+          <button data-action="lock"><span class="nav-icon">🔒</span>锁定操作库</button>
         </nav>
-        <div class="side-note">
-          <strong>持续整理中</strong>
-          <p>连续光与飞秒激光器操作指南已录入，可继续添加其他设备和实验技巧。</p>
+
+        <div class="sidebar-footer">
+          <strong id="sidebarReading">已录入 2 份指南</strong>
+          <p>收藏状态只保存在当前浏览器，不会上传实验数据。</p>
         </div>
       </aside>
       <div class="overlay" id="overlay"></div>
 
-      <main id="home">
+      <main>
         <header class="topbar">
-          <button class="mobile-menu" id="menuButton" aria-label="打开菜单">☰</button>
+          <button class="mobile-menu" id="menuButton" aria-label="打开菜单" aria-expanded="false">☰</button>
           <label class="search">
-            <input id="searchInput" type="search" placeholder="搜索实验、仪器、参数或技巧…" />
-            <span class="key">⌘ K</span>
+            <span class="search-icon" aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="搜索仪器、参数或操作步骤" autocomplete="off" />
+            <span class="search-key">Ctrl K</span>
           </label>
-          <div class="identity-pill">精测院学生实验手册</div>
-          <div class="top-actions">
-            <button class="icon-btn" data-action="pending" aria-label="通知">◌</button>
-            <button class="icon-btn" data-action="pending" aria-label="帮助">?</button>
+          <div class="top-institute">
+            <span>中国科学院</span>
+            <strong>精密测量科学与技术创新研究院</strong>
           </div>
         </header>
 
-        <div class="content">
-          <section class="hero">
-            <div class="hero-main">
-              <div class="hero-copy">
-                <span class="eyebrow">精测院 · ATOMIC & MOLECULAR PHYSICS</span>
-                <h1>原子分子物理实验操作库</h1>
-                <p>面向精密测量物理学习与实验工作的操作记录，集中整理设备启停、光路准直、参数经验与实验技巧。</p>
-                <div class="hero-actions">
-                  <button class="primary" data-target="library">浏览实验库</button>
-                  <button class="secondary" data-action="pending">录入一条技巧</button>
-                </div>
+        <section class="hero-band" id="home">
+          <div class="hero-inner">
+            <div class="hero-copy">
+              <p class="eyebrow">精密测量院 · ATOMIC &amp; MOLECULAR PHYSICS</p>
+              <h1><span>原子分子物理</span><span>实验操作库</span></h1>
+              <p>面向学生实验工作的操作记录，集中整理设备启停、光路准直、关键参数和现场经验。内容以实验室现行规程与负责人要求为准。</p>
+              <div class="hero-actions">
+                <button class="primary-btn" data-scroll="library">开始查阅</button>
+                <button class="secondary-btn" data-action="expand-all">展开全部步骤</button>
               </div>
-              <div class="orbit-visual" aria-hidden="true"><span class="orbit"></span><span class="orbit"></span><span class="orbit"></span><span class="nucleus"></span><span class="electron one"></span><span class="electron two"></span><span class="electron three"></span><span class="beam"></span></div>
             </div>
-            <aside class="status-card">
-              <div><h2>知识库完成度</h2><p>已录入首批激光器操作与准直步骤</p></div>
-              <div class="progress-ring" style="background:conic-gradient(var(--green) 0 38%, #e8efec 38% 100%)"><div class="progress-value">38%<small>内容录入中</small></div></div>
-              <div class="stats">
-                <div class="stat"><strong>4</strong><span>分类</span></div>
-                <div class="stat"><strong>2</strong><span>指南</span></div>
-                <div class="stat"><strong>2</strong><span>正式条目</span></div>
-              </div>
-            </aside>
-          </section>
 
+            <div class="hero-visual" role="img" aria-label="激光与原子参数示意">
+              <div class="atom-stage" aria-hidden="true">
+                <span class="orbit"></span>
+                <span class="orbit two"></span>
+                <span class="orbit three"></span>
+                <span class="nucleus"></span>
+                <span class="electron one"></span>
+                <span class="electron two"></span>
+                <span class="electron three"></span>
+                <span class="laser-beam"></span>
+              </div>
+              <div class="readouts">
+                <div class="readout"><small>BEAT NOTE</small><strong>1 Hz</strong></div>
+                <div class="readout"><small>LASER CURRENT</small><strong>120 mA</strong></div>
+                <div class="readout"><small>FAN SPEED</small><strong>650 rpm</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="status-strip" aria-label="知识库状态">
+            <div class="progress-block">
+              <div class="progress-copy"><span>知识库状态</span><strong>内容持续整理中</strong></div>
+            </div>
+            <div class="metric"><strong id="guideCount">2</strong><span>已录入指南</span></div>
+            <div class="metric"><strong id="categoryCount">4</strong><span>实验分类</span></div>
+            <div class="metric"><strong id="favoriteCount">0</strong><span>我的收藏</span></div>
+          </div>
+        </section>
+
+        <div class="content">
           <section class="section" id="categories">
             <div class="section-head">
-              <div><h2>技巧分类</h2><p>按实验工作的实际场景组织知识，而不是按论文目录堆放。</p></div>
-              <button class="text-btn" data-action="pending">管理分类 →</button>
+              <div>
+                <h2>按实验场景查找</h2>
+                <p>分类会直接筛选下方指南；再次点击当前分类即可取消筛选。</p>
+              </div>
+              <button class="text-btn" data-action="reset">查看全部指南 →</button>
             </div>
             <div class="category-grid">
-              <article class="category" data-search="真空系统 抽气 检漏 烘烤">
-                <div class="category-icon">◉</div><h3>真空系统</h3><p>抽气、检漏、烘烤与压力异常</p>
-              </article>
-              <article class="category" data-search="激光 光路 调节 锁频 光纤">
-                <div class="category-icon">⌁</div><h3>激光与光路</h3><p>准直、耦合、锁频与光路稳定</p>
-              </article>
-              <article class="category" data-search="原子 分子 制备 冷却 囚禁">
-                <div class="category-icon">✣</div><h3>原子分子制备</h3><p>装载、冷却、囚禁与态制备</p>
-              </article>
-              <article class="category" data-search="探测 数据 采集 成像 标定">
-                <div class="category-icon">▦</div><h3>探测与采集</h3><p>成像、信号采集、标定与噪声</p>
-              </article>
+              <button class="category" data-category="laser" aria-pressed="false">
+                <span class="category-top"><span class="category-icon">↯</span><span class="category-count">2 条指南</span></span>
+                <span class="category-title">激光与光路</span>
+                <span class="category-description">连续光、飞秒激光、准直与光路控制</span>
+              </button>
+              <button class="category" data-category="vacuum" aria-pressed="false">
+                <span class="category-top"><span class="category-icon">◉</span><span class="category-count">待录入</span></span>
+                <span class="category-title">真空系统</span>
+                <span class="category-description">抽气、检漏、烘烤与压力异常</span>
+              </button>
+              <button class="category" data-category="atoms" aria-pressed="false">
+                <span class="category-top"><span class="category-icon">◎</span><span class="category-count">待录入</span></span>
+                <span class="category-title">原子分子制备</span>
+                <span class="category-description">装载、冷却、囚禁与态制备</span>
+              </button>
+              <button class="category" data-category="detection" aria-pressed="false">
+                <span class="category-top"><span class="category-icon">▦</span><span class="category-count">待录入</span></span>
+                <span class="category-title">探测与采集</span>
+                <span class="category-description">成像、信号采集、标定与噪声</span>
+              </button>
             </div>
           </section>
 
           <section class="section" id="library">
-            <div class="section-head">
-              <div><h2>实验操作库</h2><p>按设备整理的开机、检查、调节与准直操作。</p></div>
-              <button class="text-btn" data-action="pending">查看全部 →</button>
+            <div class="section-head library-head">
+              <div>
+                <h2>实验操作库</h2>
+                <p>收藏常用指南，展开条目即可查看完整操作步骤。</p>
+              </div>
+              <div class="library-tools">
+                <span class="result-count" id="resultCount" aria-live="polite">显示 2 / 2 条指南</span>
+                <button class="tool-btn hidden" id="resetButton" data-action="reset">× 清除筛选</button>
+                <button class="tool-btn" id="expandButton" data-action="toggle-all">↕ 全部展开</button>
+              </div>
             </div>
+            <div class="filter-summary" id="filterSummary" aria-live="polite">当前显示全部指南</div>
+
             <div class="library" id="entryList">
-              <article class="entry procedure" data-search="连续光 激光器 AB光 A光 B光 C光 D光 shutter control 红盒按钮 调制 SOF8-409 sigma studio mixer 功率放大器 准直 dataray 干涉条纹 120mA 关机">
+              <article
+                class="entry procedure"
+                data-entry-id="cw-laser"
+                data-category="laser"
+                data-search="连续光 激光器 AB光 A光 B光 C光 D光 Shutter Control 红盒按钮 调制 SOF8-409 SigmaStudio mixer 功率放大器 准直 DataRay 干涉条纹 120 mA 关机"
+              >
                 <span class="entry-num">01</span>
-                <div>
-                  <h3>开启连续光激光器（AB光）</h3>
-                  <p>连续光激光器的调制、通道检查、功率放大器开启及近远端准直流程。</p>
-                  <div class="tags"><span class="tag">连续光</span><span class="tag">AB光</span><span class="tag">准直</span><span class="tag">120 mA</span></div>
-                  <details open>
+                <div class="entry-main">
+                  <div class="entry-header">
+                    <div class="entry-title">
+                      <h3>连续光激光器操作方法（以 AB 光为例）</h3>
+                      <p>调制、通道检查、功率放大器开启，以及近端与远端准直流程。</p>
+                    </div>
+                    <div class="entry-actions">
+                      <button class="favorite-btn" data-favorite-id="cw-laser" aria-label="收藏连续光激光器指南" aria-pressed="false" title="收藏">☆</button>
+                    </div>
+                  </div>
+                  <div class="tags"><span class="tag">连续光</span><span class="tag">AB 光</span><span class="tag">准直</span><span class="tag">120 mA</span></div>
+                  <details>
                     <summary>查看完整操作步骤</summary>
                     <div class="procedure-body">
-                      <div class="step-group"><h4>开启流程</h4><ol>
-                        <li>开启调制：使用软件 <strong>SOF8-409</strong>，设置 <strong>1 Hz 差频</strong>，便于后续调准直。</li>
-                        <li>打开激光器，缓慢调高激光器电流至 <strong>120 mA</strong>。</li>
-                        <li>检查调频软件 <strong>SigmaStudio</strong>（位于 <strong>mixer</strong> 文件夹），确认右下角连接的是<strong>一号通道</strong>。</li>
-                        <li>开启功率放大器的一号、二号通道，分别对应 A 光和 B 光。</li>
-                        <li>确认光路控制方式：A、C、D 光由 <strong>Shutter Control</strong> 控制，B 光由<strong>红盒按钮</strong>控制。</li>
-                        <li>通过对应控制方式打开 A 光和 B 光。</li>
-                      </ol></div>
-                      <div class="step-group"><h4>AB 光准直</h4><ol>
-                        <li>打开 <strong>DataRay</strong>。</li>
-                        <li>近端准直：观察光斑对齐情况。</li>
-                        <li>远端准直：观察干涉条纹。</li>
-                        <li>分别使用近端、远端的镜子调节对应位置的光；“近端/远端”按与光源的距离区分。</li>
-                      </ol></div>
-                      <div class="step-group"><h4>关机</h4><ol><li>按开启顺序反向执行。</li></ol></div>
+                      <div class="step-group">
+                        <h4>开启流程</h4>
+                        <ol>
+                          <li>开启调制：使用软件 <strong>SOF8-409</strong>，设置 <strong>1 Hz 差频</strong>，方便后续调准直。</li>
+                          <li>打开激光器，缓慢调高激光器电流至 <strong>120 mA</strong>。</li>
+                          <li>检查调频软件 <strong>SigmaStudio</strong>（位于 <strong>mixer</strong> 文件夹），确认右下角连接的是<strong>一号通道</strong>。</li>
+                          <li>开启功率放大器的一号、二号通道，分别对应 A 光和 B 光。</li>
+                          <li>确认控制方式：A、C、D 光由 <strong>Shutter Control</strong> 控制，B 光由<strong>红盒按钮</strong>控制。</li>
+                          <li>通过对应控制方式打开 A 光和 B 光。</li>
+                        </ol>
+                      </div>
+                      <div class="step-group">
+                        <h4>AB 光准直</h4>
+                        <ol>
+                          <li>打开 <strong>DataRay</strong>。</li>
+                          <li>近端准直：观察光斑对齐情况。</li>
+                          <li>远端准直：观察干涉条纹。</li>
+                          <li>分别使用近端、远端的镜子调节对应位置的光；“近端 / 远端”按与光源的距离区分。</li>
+                        </ol>
+                      </div>
+                      <div class="step-group shutdown">
+                        <h4>关机</h4>
+                        <ol><li>按开启顺序反向执行。</li></ol>
+                      </div>
                     </div>
                   </details>
                 </div>
               </article>
-              <article class="entry procedure" data-search="飞秒 激光器 水冷 空调 风机 转速 650 rpm 除湿 温控 laser control 预热 15 30分钟 opa 凹透镜 功率计 挡板 关机">
+
+              <article
+                class="entry procedure"
+                data-entry-id="fs-laser"
+                data-category="laser"
+                data-search="飞秒 激光器 水冷 空调 风机 转速 650 rpm 除湿 温控 Laser Control 预热 15 30 分钟 OPA 凹透镜 功率计 挡板 关机"
+              >
                 <span class="entry-num">02</span>
-                <div>
-                  <h3>开启飞秒激光器</h3>
-                  <p>水冷与环境确认、Laser Control 预热、光学器件防护及 OPA 开启流程。</p>
+                <div class="entry-main">
+                  <div class="entry-header">
+                    <div class="entry-title">
+                      <h3>飞秒激光器操作方法</h3>
+                      <p>水冷与环境确认、Laser Control 预热、光学器件防护和 OPA 开启流程。</p>
+                    </div>
+                    <div class="entry-actions">
+                      <button class="favorite-btn" data-favorite-id="fs-laser" aria-label="收藏飞秒激光器指南" aria-pressed="false" title="收藏">☆</button>
+                    </div>
+                  </div>
                   <div class="tags"><span class="tag">飞秒激光</span><span class="tag">OPA</span><span class="tag">水冷</span><span class="tag">环境控制</span></div>
-                  <details open>
+                  <details>
                     <summary>查看完整操作步骤</summary>
                     <div class="procedure-body">
-                      <div class="step-group"><h4>环境与设备准备</h4><ol>
-                        <li>确认两台水冷均已开启，空调正常运行。</li>
-                        <li>将风机转速调至 <strong>650 rpm</strong>；需要时开启除湿和温控。</li>
-                        <li>打开 <strong>Laser Control</strong>，预热 <strong>15～30 分钟</strong>，并完成记录。</li>
-                      </ol></div>
-                      <div class="step-group"><h4>光路与 OPA</h4><ol>
-                        <li>确认凹透镜和功率计安装正常，然后放上挡板。</li>
-                        <li>打开 <strong>OPA</strong>。</li>
-                        <li>取下凹透镜和功率计。</li>
-                        <li>取下挡板，并完成记录。</li>
-                      </ol></div>
-                      <div class="step-group"><h4>关机</h4><ol><li>按开机顺序反向执行。</li></ol></div>
+                      <div class="step-group">
+                        <h4>环境与设备准备</h4>
+                        <ol>
+                          <li>确保两台水冷均已开启，空调正常运行。</li>
+                          <li>将风机转速调至 <strong>650 rpm</strong>；需要时开启除湿和温控。</li>
+                          <li>打开 <strong>Laser Control</strong>，预热 <strong>15–30 分钟</strong>，并完成记录。</li>
+                        </ol>
+                      </div>
+                      <div class="step-group">
+                        <h4>光路与 OPA</h4>
+                        <ol>
+                          <li>确保凹透镜和功率计正常安装，然后放上挡板。</li>
+                          <li>打开 <strong>OPA</strong>。</li>
+                          <li>取下凹透镜和功率计。</li>
+                          <li>取下挡板，并完成记录。</li>
+                        </ol>
+                      </div>
+                      <div class="step-group shutdown">
+                        <h4>关机</h4>
+                        <ol><li>按开机顺序反向执行。</li></ol>
+                      </div>
                     </div>
                   </details>
                 </div>
               </article>
-              <article class="entry empty" data-search="待补充">
-                <div><strong>＋ 继续添加实验资料</strong><span>可以直接发送文字、表格、照片或现有笔记</span></div>
-              </article>
-              <article class="entry empty" data-search="待补充">
-                <div><strong>资料会被结构化整理</strong><span>我会统一术语、层级、标签和注意事项</span></div>
-              </article>
+            </div>
+
+            <div class="no-results hidden" id="noResults" role="status">
+              <strong>没有符合条件的指南</strong>
+              <span>可以清除筛选，或把新的实验资料继续发给我录入。</span>
+            </div>
+
+            <div class="contribution-band" id="contribute">
+              <div>
+                <strong>继续完善操作库</strong>
+                <p>后续可继续补充真空系统、原子分子制备、探测采集以及现场照片。</p>
+              </div>
+              <button class="tool-btn" data-action="add">＋ 录入新资料</button>
             </div>
           </section>
+
+          <footer class="page-footer">
+            中国科学院精密测量科学与技术创新研究院学生实验手册 · 学生整理，非院方正式规程或官方发布。
+          </footer>
         </div>
       </main>
     </div>
-    <div class="toast" id="toast">该功能将在内容录入阶段启用</div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
+      const accessGate = document.querySelector('#accessGate');
+      const accessForm = document.querySelector('#accessForm');
+      const accessPassword = document.querySelector('#accessPassword');
+      const accessSubmit = document.querySelector('#accessSubmit');
+      const accessError = document.querySelector('#accessError');
+      const appShell = document.querySelector('#appShell');
       const sidebar = document.querySelector('#sidebar');
       const overlay = document.querySelector('#overlay');
+      const menuButton = document.querySelector('#menuButton');
       const toast = document.querySelector('#toast');
       const searchInput = document.querySelector('#searchInput');
-      const searchable = [...document.querySelectorAll('[data-search]')];
+      const entries = [...document.querySelectorAll('.procedure[data-entry-id]')];
+      const categoryButtons = [...document.querySelectorAll('.category[data-category]')];
+      const favoritesNav = document.querySelector('#favoritesNav');
+      const resultCount = document.querySelector('#resultCount');
+      const filterSummary = document.querySelector('#filterSummary');
+      const resetButton = document.querySelector('#resetButton');
+      const expandButton = document.querySelector('#expandButton');
+      const noResults = document.querySelector('#noResults');
+      const validIds = new Set(entries.map((entry) => entry.dataset.entryId));
+      const accessSessionKey = 'amo-lab:access:v1';
+      const accessPasswordHash = '0b59b63958709c2c508c39a42d044b9a04ba44d67d534a8985a3ea672b6676ce';
 
-      function closeMenu() { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
+      const storageKeys = {
+        favorites: 'amo-lab:favorites:v1'
+      };
+
+      async function hashPassword(value) {
+        const data = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+      }
+
+      function hasAccessSession() {
+        try { return sessionStorage.getItem(accessSessionKey) === 'granted'; }
+        catch { return false; }
+      }
+
+      function unlockApp(saveSession = true) {
+        if (saveSession) {
+          try { sessionStorage.setItem(accessSessionKey, 'granted'); } catch {}
+        }
+        document.body.classList.remove('is-locked');
+        accessGate.hidden = true;
+        appShell.removeAttribute('inert');
+        appShell.setAttribute('aria-hidden', 'false');
+        accessForm.reset();
+        accessError.textContent = '';
+        accessPassword.removeAttribute('aria-invalid');
+      }
+
+      function lockApp() {
+        try { sessionStorage.removeItem(accessSessionKey); } catch {}
+        closeMenu();
+        document.body.classList.add('is-locked');
+        accessGate.hidden = false;
+        appShell.setAttribute('inert', '');
+        appShell.setAttribute('aria-hidden', 'true');
+        accessForm.reset();
+        accessError.textContent = '';
+        accessPassword.removeAttribute('aria-invalid');
+        requestAnimationFrame(() => accessPassword.focus());
+      }
+
+      accessForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        accessSubmit.disabled = true;
+        accessError.textContent = '';
+        try {
+          const candidateHash = await hashPassword(accessPassword.value);
+          if (candidateHash === accessPasswordHash) {
+            unlockApp();
+          } else {
+            accessError.textContent = '密码不正确，请重新输入。';
+            accessPassword.setAttribute('aria-invalid', 'true');
+            accessPassword.select();
+          }
+        } catch {
+          accessError.textContent = '当前浏览器无法验证密码，请更换浏览器后重试。';
+        } finally {
+          accessSubmit.disabled = false;
+        }
+      });
+
+      function loadSet(key) {
+        try {
+          const value = JSON.parse(localStorage.getItem(key) || '[]');
+          return new Set(Array.isArray(value) ? value.filter((id) => validIds.has(id)) : []);
+        } catch {
+          return new Set();
+        }
+      }
+
+      function saveSet(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify([...value]));
+        } catch {
+          showToast('当前浏览器无法保存本地状态');
+        }
+      }
+
+      let favorites = loadSet(storageKeys.favorites);
+      const viewState = { query: '', category: null, favoritesOnly: false };
+
+      function normalize(value) {
+        return String(value).normalize('NFKC').toLowerCase();
+      }
+
+      function closeMenu() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }
+
       function showToast(message) {
         toast.textContent = message;
         toast.classList.add('show');
@@ -389,34 +1300,182 @@
         window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
       }
 
-      document.querySelector('#menuButton').addEventListener('click', () => {
-        sidebar.classList.toggle('open'); overlay.classList.toggle('show');
+      function visibleEntries() {
+        const terms = normalize(viewState.query).split(/\s+/).filter(Boolean);
+        return entries.filter((entry) => {
+          const haystack = normalize(`${entry.dataset.search} ${entry.textContent}`);
+          const matchesQuery = terms.every((term) => haystack.includes(term));
+          const matchesCategory = !viewState.category || entry.dataset.category === viewState.category;
+          const matchesFavorites = !viewState.favoritesOnly || favorites.has(entry.dataset.entryId);
+          return matchesQuery && matchesCategory && matchesFavorites;
+        });
+      }
+
+      function updateEntryButtons() {
+        document.querySelectorAll('[data-favorite-id]').forEach((button) => {
+          const active = favorites.has(button.dataset.favoriteId);
+          button.setAttribute('aria-pressed', String(active));
+          button.textContent = active ? '★' : '☆';
+          button.title = active ? '取消收藏' : '收藏';
+        });
+
+      }
+
+      function updateStats() {
+        const total = entries.length;
+        document.querySelector('#guideCount').textContent = total;
+        document.querySelector('#categoryCount').textContent = categoryButtons.length;
+        document.querySelector('#favoriteCount').textContent = favorites.size;
+        document.querySelector('#sidebarReading').textContent = `已录入 ${total} 份指南`;
+        categoryButtons.forEach((button) => {
+          const count = entries.filter((entry) => entry.dataset.category === button.dataset.category).length;
+          button.querySelector('.category-count').textContent = count ? `${count} 条指南` : '待录入';
+        });
+      }
+
+      function syncExpandButton() {
+        const visible = visibleEntries();
+        const allOpen = visible.length > 0 && visible.every((entry) => entry.querySelector('details').open);
+        expandButton.disabled = visible.length === 0;
+        expandButton.textContent = allOpen ? '↕ 全部收起' : '↕ 全部展开';
+      }
+
+      function renderLibrary() {
+        const visible = visibleEntries();
+        const visibleIds = new Set(visible.map((entry) => entry.dataset.entryId));
+        entries.forEach((entry) => entry.classList.toggle('hidden', !visibleIds.has(entry.dataset.entryId)));
+
+        categoryButtons.forEach((button) => {
+          button.setAttribute('aria-pressed', String(button.dataset.category === viewState.category));
+        });
+        favoritesNav.setAttribute('aria-pressed', String(viewState.favoritesOnly));
+        favoritesNav.classList.toggle('active', viewState.favoritesOnly);
+
+        const hasFilters = Boolean(viewState.query || viewState.category || viewState.favoritesOnly);
+        resetButton.classList.toggle('hidden', !hasFilters);
+        noResults.classList.toggle('hidden', visible.length !== 0);
+        resultCount.textContent = `显示 ${visible.length} / ${entries.length} 条指南`;
+
+        const labels = [];
+        if (viewState.category) {
+          const activeCategory = categoryButtons.find((button) => button.dataset.category === viewState.category);
+          labels.push(`分类：${activeCategory?.querySelector('.category-title').textContent || viewState.category}`);
+        }
+        if (viewState.query) labels.push(`搜索：“${viewState.query}”`);
+        if (viewState.favoritesOnly) labels.push('仅看收藏');
+        filterSummary.textContent = labels.length
+          ? `当前筛选：${labels.join(' · ')}`
+          : '当前显示全部指南';
+
+        updateEntryButtons();
+        updateStats();
+        syncExpandButton();
+      }
+
+      function resetFilters() {
+        viewState.query = '';
+        viewState.category = null;
+        viewState.favoritesOnly = false;
+        searchInput.value = '';
+        renderLibrary();
+      }
+
+      function scrollToSection(id) {
+        document.querySelector(`#${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('.nav button').forEach((button) => {
+          const active = viewState.favoritesOnly
+            ? button === favoritesNav
+            : button.dataset.scroll === id;
+          button.classList.toggle('active', active);
+        });
+        closeMenu();
+      }
+
+      menuButton.addEventListener('click', () => {
+        const open = !sidebar.classList.contains('open');
+        sidebar.classList.toggle('open', open);
+        overlay.classList.toggle('show', open);
+        menuButton.setAttribute('aria-expanded', String(open));
       });
       overlay.addEventListener('click', closeMenu);
 
-      document.addEventListener('click', (event) => {
-        const targetButton = event.target.closest('[data-target]');
-        const pendingButton = event.target.closest('[data-action="pending"]');
-        if (targetButton) {
-          document.querySelectorAll('.nav button').forEach(btn => btn.classList.toggle('active', btn === targetButton));
-          document.querySelector(`#${targetButton.dataset.target}`)?.scrollIntoView({ behavior: 'smooth' });
-          closeMenu();
-        }
-        if (pendingButton) showToast('外围已预留，等资料确认后启用');
+      searchInput.addEventListener('input', () => {
+        viewState.query = searchInput.value.trim();
+        renderLibrary();
       });
 
-      searchInput.addEventListener('input', () => {
-        const query = searchInput.value.trim().toLowerCase();
-        searchable.forEach(item => {
-          item.style.display = !query || `${item.dataset.search} ${item.textContent}`.toLowerCase().includes(query) ? '' : 'none';
+      categoryButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          viewState.category = viewState.category === button.dataset.category ? null : button.dataset.category;
+          renderLibrary();
+          scrollToSection('library');
         });
       });
 
+      document.addEventListener('click', (event) => {
+        const scrollButton = event.target.closest('[data-scroll]');
+        const actionButton = event.target.closest('[data-action]');
+        const favoriteButton = event.target.closest('[data-favorite-id]');
+
+        if (scrollButton) scrollToSection(scrollButton.dataset.scroll);
+
+        if (favoriteButton) {
+          const id = favoriteButton.dataset.favoriteId;
+          favorites.has(id) ? favorites.delete(id) : favorites.add(id);
+          saveSet(storageKeys.favorites, favorites);
+          renderLibrary();
+          showToast(favorites.has(id) ? '已加入收藏' : '已取消收藏');
+        }
+
+        if (!actionButton) return;
+        const action = actionButton.dataset.action;
+        if (action === 'favorites') {
+          viewState.favoritesOnly = !viewState.favoritesOnly;
+          renderLibrary();
+          scrollToSection('library');
+        }
+        if (action === 'reset') {
+          resetFilters();
+          scrollToSection('library');
+        }
+        if (action === 'toggle-all' || action === 'expand-all') {
+          const visible = visibleEntries();
+          const shouldOpen = action === 'expand-all' || !visible.every((entry) => entry.querySelector('details').open);
+          visible.forEach((entry) => { entry.querySelector('details').open = shouldOpen; });
+          syncExpandButton();
+          if (action === 'expand-all') scrollToSection('library');
+        }
+        if (action === 'add') showToast('把新的文字、表格或照片发给我，我会继续整理到操作库');
+        if (action === 'fields') showToast('字段会随新资料一起扩展，目前无需单独设置');
+        if (action === 'lock') lockApp();
+      });
+
+      entries.forEach((entry) => entry.querySelector('details').addEventListener('toggle', syncExpandButton));
+
       document.addEventListener('keydown', (event) => {
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-          event.preventDefault(); searchInput.focus();
+          event.preventDefault();
+          searchInput.focus();
+        }
+        if (event.key === 'Escape') {
+          if (searchInput.value) {
+            searchInput.value = '';
+            viewState.query = '';
+            renderLibrary();
+          } else {
+            closeMenu();
+          }
         }
       });
+
+      window.addEventListener('storage', (event) => {
+        if (event.key === storageKeys.favorites) favorites = loadSet(storageKeys.favorites);
+        renderLibrary();
+      });
+
+      if (hasAccessSession()) unlockApp(false);
+      else requestAnimationFrame(() => accessPassword.focus());
+      renderLibrary();
     </script>
   </body>
 </html>
