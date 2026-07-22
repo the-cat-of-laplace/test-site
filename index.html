@@ -149,6 +149,16 @@
       .entry p { color: var(--muted); margin: 0; font-size: 11px; line-height: 1.65; }
       .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 7px; }
       .tag { background: #eef5f2; color: #3f6b5d; border-radius: 20px; padding: 5px 9px; font-size: 9px; font-weight: 700; }
+      .procedure { grid-column: 1 / -1; display: grid; grid-template-columns: 54px 1fr; }
+      .procedure details { margin-top: 17px; border-top: 1px solid var(--line); padding-top: 15px; }
+      .procedure summary { cursor: pointer; color: var(--green); font-size: 12px; font-weight: 800; }
+      .procedure-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 15px; }
+      .step-group { padding: 17px; border-radius: 12px; background: #f6f9f7; }
+      .step-group h4 { margin: 0 0 11px; font-size: 12px; }
+      .step-group ol, .step-group ul { margin: 0; padding-left: 20px; color: #4f625b; font-size: 11px; line-height: 1.8; }
+      .step-group li + li { margin-top: 5px; }
+      .caution { border-left: 3px solid var(--amber); background: #fff8e9; }
+      .pending-field { color: #8a6115; font-weight: 700; }
       .empty { border-style: dashed; background: transparent; align-items: center; justify-content: center; min-height: 145px; color: var(--muted); text-align: center; }
       .empty strong { display: block; color: var(--ink); margin-bottom: 5px; }
 
@@ -179,7 +189,7 @@
         .status-card { display: block; }
         .status-card > p { margin-bottom: 22px; }
         .progress-ring { margin: 0 auto 22px; }
-        .category-grid, .library { grid-template-columns: 1fr; }
+        .category-grid, .library, .procedure-body { grid-template-columns: 1fr; }
         .section-head { align-items: flex-start; }
         .key { display: none; }
         .search input { padding-right: 14px; }
@@ -207,7 +217,7 @@
         </nav>
         <div class="side-note">
           <strong>资料待补充</strong>
-          <p>目前已完成网站结构。实验步骤、关键参数、故障排查与安全提醒将在收到资料后录入。</p>
+          <p>首批激光器操作指南已录入。后续将继续补充关键参数、故障排查与安全确认项。</p>
         </div>
       </aside>
       <div class="overlay" id="overlay"></div>
@@ -237,12 +247,12 @@
               </div>
             </div>
             <aside class="status-card">
-              <div><h2>知识库完成度</h2><p>外围结构已就绪，等待实验资料录入</p></div>
-              <div class="progress-ring"><div class="progress-value">18%<small>框架阶段</small></div></div>
+              <div><h2>知识库完成度</h2><p>已录入首批激光器操作与准直步骤</p></div>
+              <div class="progress-ring" style="background:conic-gradient(var(--green) 0 38%, #e8efec 38% 100%)"><div class="progress-value">38%<small>内容录入中</small></div></div>
               <div class="stats">
                 <div class="stat"><strong>4</strong><span>分类</span></div>
-                <div class="stat"><strong>2</strong><span>模板</span></div>
-                <div class="stat"><strong>0</strong><span>正式条目</span></div>
+                <div class="stat"><strong>2</strong><span>指南</span></div>
+                <div class="stat"><strong>2</strong><span>正式条目</span></div>
               </div>
             </aside>
           </section>
@@ -270,20 +280,64 @@
 
           <section class="section" id="library">
             <div class="section-head">
-              <div><h2>实验操作库</h2><p>下面是内容模板，正式条目将在你提供资料后替换。</p></div>
+              <div><h2>实验操作库</h2><p>按设备整理的开机、检查、调节与准直操作。</p></div>
               <button class="text-btn" data-action="pending">查看全部 →</button>
             </div>
             <div class="library" id="entryList">
-              <article class="entry" data-search="标准实验条目 操作流程 参数 安全">
+              <article class="entry procedure" data-search="连续光 激光器 AB光 调制 SOF8-409 sigma studio mixer 功率放大器 准直 dataray 干涉条纹 120mA">
                 <span class="entry-num">01</span>
-                <div><h3>标准实验条目模板</h3><p>用于记录实验目的、准备条件、逐步操作、关键参数、判断标准、安全提示与常见问题。</p><div class="tags"><span class="tag">待填充</span><span class="tag">操作流程</span><span class="tag">安全</span></div></div>
+                <div>
+                  <h3>开启连续光激光器（AB光）</h3>
+                  <p>连续光激光器的调制、通道检查、功率放大器开启及近远端准直流程。</p>
+                  <div class="tags"><span class="tag">连续光</span><span class="tag">AB光</span><span class="tag">准直</span><span class="tag">120 mA</span></div>
+                  <details open>
+                    <summary>查看完整操作步骤</summary>
+                    <div class="procedure-body">
+                      <div class="step-group"><h4>开启流程</h4><ol>
+                        <li>开启调制：使用软件 <strong>SOF8-409</strong>，设置 <strong>1 Hz 差频</strong>，便于后续调准直。</li>
+                        <li>打开激光器，缓慢调高激光器电流至 <strong>120 mA</strong>。</li>
+                        <li>检查调频软件 <strong>SigmaStudio</strong>（位于 <strong>mixer</strong> 文件夹），确认右下角连接的是<strong>一号通道</strong>。</li>
+                        <li>开启功率放大器的一号、二号通道，分别对应 A 光和 B 光。</li>
+                        <li>打开 AB 光。</li>
+                      </ol></div>
+                      <div class="step-group"><h4>AB 光准直</h4><ol>
+                        <li>打开 <strong>DataRay</strong>。</li>
+                        <li>近端准直：观察光斑对齐情况。</li>
+                        <li>远端准直：观察干涉条纹。</li>
+                        <li>分别使用近端、远端的镜子调节对应位置的光；“近端/远端”按与光源的距离区分。</li>
+                      </ol></div>
+                      <div class="step-group caution"><h4>安全与确认项</h4><ul><li>执行前遵循实验室激光安全规范并确认防护与联锁状态。</li><li class="pending-field">关机顺序、允许功率范围及异常处置待补充。</li></ul></div>
+                    </div>
+                  </details>
+                </div>
               </article>
-              <article class="entry" data-search="故障排查 问题 现象 原因 处理">
+              <article class="entry procedure" data-search="飞秒 激光器 水冷 空调 转速 650 除湿 温控 laser control 预热 opa 凹透镜 功率计 挡板">
                 <span class="entry-num">02</span>
-                <div><h3>故障排查条目模板</h3><p>从可观察现象出发，记录可能原因、排查顺序、确认方法及恢复操作，减少重复试错。</p><div class="tags"><span class="tag">待填充</span><span class="tag">Troubleshooting</span></div></div>
+                <div>
+                  <h3>开启飞秒激光器</h3>
+                  <p>水冷与环境确认、Laser Control 预热、光学器件防护及 OPA 开启流程。</p>
+                  <div class="tags"><span class="tag">飞秒激光</span><span class="tag">OPA</span><span class="tag">水冷</span><span class="tag">环境控制</span></div>
+                  <details open>
+                    <summary>查看完整操作步骤</summary>
+                    <div class="procedure-body">
+                      <div class="step-group"><h4>环境与设备准备</h4><ol>
+                        <li>确认两台水冷均已开启，空调正常运行。</li>
+                        <li>将转速调至 <strong>650</strong>；需要时开启除湿和温控。</li>
+                        <li>打开 <strong>Laser Control</strong> 进行预热，并完成记录。</li>
+                      </ol></div>
+                      <div class="step-group"><h4>光路与 OPA</h4><ol>
+                        <li>确认凹透镜和功率计安装正常，然后放上挡板。</li>
+                        <li>打开 <strong>OPA</strong>。</li>
+                        <li>取下凹透镜和功率计。</li>
+                        <li>取下挡板，并完成记录。</li>
+                      </ol></div>
+                      <div class="step-group caution"><h4>待确认字段</h4><ul><li class="pending-field">“转速 650”的单位和对应设备待补充。</li><li class="pending-field">预热时长、记录项目及关机顺序待补充。</li><li>移动器件及挡板前遵循实验室激光安全规范。</li></ul></div>
+                    </div>
+                  </details>
+                </div>
               </article>
               <article class="entry empty" data-search="待补充">
-                <div><strong>＋ 等待第一条实验资料</strong><span>你可以直接发文字、表格、照片或现有笔记</span></div>
+                <div><strong>＋ 继续添加实验资料</strong><span>可以直接发送文字、表格、照片或现有笔记</span></div>
               </article>
               <article class="entry empty" data-search="待补充">
                 <div><strong>资料会被结构化整理</strong><span>我会统一术语、层级、标签和注意事项</span></div>
