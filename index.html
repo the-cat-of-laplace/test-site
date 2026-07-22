@@ -4,26 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="原子分子物理实验操作、技巧与经验知识库。" />
-    <title>AMP Lab · 原子分子物理操作库</title>
+    <title>精测 · AMO Lab | 原子分子物理实验操作库</title>
     <style>
       :root {
-        --ink: #10221d;
-        --muted: #687872;
-        --line: #dce5e1;
-        --paper: #f4f7f5;
+        --ink: #15201d;
+        --muted: #65716d;
+        --line: #d9e1de;
+        --paper: #f5f7f6;
         --card: #ffffff;
-        --forest: #0e3027;
-        --green: #247861;
-        --mint: #d7eee6;
-        --amber: #f5c86b;
-        --shadow: 0 18px 45px rgba(24, 52, 44, 0.08);
+        --forest: #102d27;
+        --green: #176c57;
+        --mint: #dff1eb;
+        --amber: #e8b44e;
+        --blue: #426bba;
+        --coral: #c55f4f;
+        --shadow: 0 12px 32px rgba(23, 48, 41, 0.08);
       }
 
       * { box-sizing: border-box; }
       html { scroll-behavior: smooth; }
       body {
         margin: 0;
-        background: var(--paper);
+        background-color: var(--paper);
+        background-image: linear-gradient(rgba(28, 72, 60, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(28, 72, 60, .025) 1px, transparent 1px);
+        background-size: 28px 28px;
         color: var(--ink);
         font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
       }
@@ -46,7 +50,7 @@
       .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 42px; }
       .brand-mark {
         width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.24);
-        border-radius: 13px; display: grid; place-items: center; position: relative;
+        border-radius: 8px; display: grid; place-items: center; position: relative;
       }
       .brand-mark::before, .brand-mark::after {
         content: ""; position: absolute; border: 1px solid #7fd1b5; border-radius: 50%;
@@ -54,21 +58,21 @@
       }
       .brand-mark::after { transform: rotate(-35deg); }
       .brand-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
-      .brand strong { display: block; font-size: 16px; letter-spacing: .04em; }
+      .brand strong { display: block; font-size: 16px; letter-spacing: 0; }
       .brand small { color: #9fc2b7; font-size: 11px; }
 
-      .nav-label { color: #759d91; font-size: 10px; font-weight: 700; letter-spacing: .18em; margin: 0 10px 10px; }
+      .nav-label { color: #759d91; font-size: 10px; font-weight: 700; letter-spacing: 0; margin: 0 10px 10px; }
       .nav { display: grid; gap: 7px; }
       .nav button {
         border: 0; color: #bcd2cb; background: transparent; text-align: left;
-        padding: 12px 13px; border-radius: 10px; cursor: pointer; display: flex;
+        padding: 12px 13px; border-radius: 7px; cursor: pointer; display: flex;
         align-items: center; gap: 11px; transition: .2s ease;
       }
       .nav button:hover, .nav button.active { color: #fff; background: rgba(255,255,255,.09); }
       .nav-icon { width: 20px; text-align: center; opacity: .9; }
       .side-note {
         margin-top: auto; padding: 16px; border: 1px solid rgba(255,255,255,.12);
-        border-radius: 14px; background: rgba(255,255,255,.05);
+        border-radius: 8px; background: rgba(255,255,255,.05);
       }
       .side-note strong { font-size: 13px; }
       .side-note p { margin: 7px 0 0; color: #9fc2b7; font-size: 11px; line-height: 1.6; }
@@ -82,36 +86,46 @@
       .mobile-menu { display: none; border: 0; background: none; font-size: 22px; }
       .search { position: relative; flex: 1; max-width: 580px; }
       .search input {
-        width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 44px;
+        width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 12px 44px;
         outline: none; background: #fff; color: var(--ink); transition: .2s;
       }
       .search input:focus { border-color: #73aa98; box-shadow: 0 0 0 3px rgba(36,120,97,.1); }
       .search::before { content: "⌕"; position: absolute; left: 16px; top: 8px; font-size: 23px; color: var(--muted); }
-      .key { position: absolute; right: 11px; top: 9px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 6px; color: #87948f; font-size: 11px; }
+      .key { position: absolute; right: 11px; top: 9px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 5px; color: #87948f; font-size: 11px; }
       .top-actions { margin-left: auto; display: flex; gap: 10px; }
-      .icon-btn { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 11px; background: #fff; cursor: pointer; }
+      .identity-pill { margin-left: auto; padding: 7px 11px; border-left: 3px solid var(--blue); color: #40524c; background: #fff; font-size: 11px; font-weight: 700; }
+      .icon-btn { width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; }
 
       .content { padding: 46px 5vw 70px; max-width: 1440px; margin: 0 auto; }
       .hero { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(290px, .55fr); gap: 24px; }
       .hero-main {
-        min-height: 305px; padding: 44px; border-radius: 24px; color: #f5fbf8; overflow: hidden;
-        background: linear-gradient(125deg, #123d32 0%, #1e6753 100%); position: relative;
+        min-height: 330px; padding: 44px; border-radius: 8px; color: #f5fbf8; overflow: hidden;
+        background: #123b31; position: relative;
         box-shadow: var(--shadow);
       }
       .hero-main::after {
-        content: ""; position: absolute; width: 270px; height: 270px; right: -35px; top: -40px;
-        border: 1px solid rgba(255,255,255,.15); border-radius: 50%; box-shadow:
-          0 0 0 34px rgba(255,255,255,.035), 0 0 0 76px rgba(255,255,255,.025);
+        content: ""; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent 0 55%, rgba(81, 129, 203, .16)), repeating-linear-gradient(0deg, transparent 0 39px, rgba(255,255,255,.035) 40px);
+        pointer-events: none;
       }
-      .eyebrow { color: #a8dbc9; font-size: 12px; font-weight: 700; letter-spacing: .16em; }
-      h1 { margin: 18px 0 15px; max-width: 650px; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(34px, 4vw, 54px); line-height: 1.13; letter-spacing: -.03em; }
+      .hero-copy { width: min(67%, 660px); position: relative; z-index: 2; }
+      .eyebrow { color: #a8dbc9; font-size: 12px; font-weight: 700; letter-spacing: 0; }
+      h1 { margin: 18px 0 15px; max-width: 650px; font-family: Georgia, "Noto Serif SC", serif; font-size: clamp(34px, 4vw, 52px); line-height: 1.13; letter-spacing: 0; }
       .hero-main p { max-width: 610px; color: #c9ddd6; line-height: 1.8; font-size: 14px; }
       .hero-actions { display: flex; gap: 12px; margin-top: 28px; position: relative; z-index: 1; }
-      .primary, .secondary { border: 0; border-radius: 11px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
+      .primary, .secondary { border: 0; border-radius: 7px; padding: 12px 18px; font-weight: 700; cursor: pointer; }
       .primary { color: var(--forest); background: var(--amber); }
       .secondary { color: #fff; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); }
 
-      .status-card { padding: 28px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
+      .status-card { padding: 28px; border-radius: 8px; background: var(--card); box-shadow: var(--shadow); }
+      .orbit-visual { position: absolute; z-index: 2; right: 36px; top: 50%; width: 220px; height: 220px; transform: translateY(-50%); }
+      .orbit { position: absolute; inset: 43px 8px; border: 1px solid rgba(168,219,201,.45); border-radius: 50%; transform: rotate(28deg); }
+      .orbit:nth-child(2) { transform: rotate(-28deg); }
+      .orbit:nth-child(3) { transform: rotate(90deg) scale(.78); }
+      .nucleus { position: absolute; left: 50%; top: 50%; width: 30px; height: 30px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 35px rgba(232,180,78,.55); transform: translate(-50%,-50%); }
+      .electron { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #8cb4ff; box-shadow: 0 0 18px #8cb4ff; }
+      .electron.one { left: 14px; top: 103px; } .electron.two { right: 17px; top: 64px; } .electron.three { left: 104px; bottom: 10px; }
+      .beam { position: absolute; left: -35px; right: -20px; top: 108px; height: 2px; background: linear-gradient(90deg, transparent, #e96a58 24%, #f3c363 76%, transparent); box-shadow: 0 0 10px rgba(233,106,88,.65); transform: rotate(-10deg); }
       .status-card h2 { font-size: 16px; margin: 0 0 6px; }
       .status-card > p { color: var(--muted); margin: 0 0 25px; font-size: 12px; }
       .progress-ring {
@@ -134,16 +148,19 @@
       .text-btn { border: 0; background: transparent; color: var(--green); font-weight: 700; cursor: pointer; }
       .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
       .category {
-        min-height: 150px; padding: 22px; border: 1px solid var(--line); border-radius: 17px;
+        min-height: 150px; padding: 22px; border: 1px solid var(--line); border-radius: 8px;
         background: var(--card); cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
       }
       .category:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: #a8c8bd; }
-      .category-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; background: var(--mint); font-size: 19px; }
+      .category-icon { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 7px; background: var(--mint); font-size: 19px; }
+      .category:nth-child(2) .category-icon { background: #e5ecfa; color: var(--blue); }
+      .category:nth-child(3) .category-icon { background: #fff0df; color: #a56a18; }
+      .category:nth-child(4) .category-icon { background: #f8e8e5; color: var(--coral); }
       .category h3 { margin: 18px 0 5px; font-size: 15px; }
       .category p { margin: 0; color: var(--muted); font-size: 11px; }
 
       .library { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
-      .entry { padding: 24px; border: 1px solid var(--line); border-radius: 17px; background: #fff; display: flex; gap: 18px; align-items: flex-start; }
+      .entry { padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: #fff; display: flex; gap: 18px; align-items: flex-start; }
       .entry-num { color: #8eb1a5; font-family: Georgia, serif; font-size: 25px; }
       .entry h3 { margin: 0 0 8px; font-size: 15px; }
       .entry p { color: var(--muted); margin: 0; font-size: 11px; line-height: 1.65; }
@@ -153,7 +170,7 @@
       .procedure details { margin-top: 17px; border-top: 1px solid var(--line); padding-top: 15px; }
       .procedure summary { cursor: pointer; color: var(--green); font-size: 12px; font-weight: 800; }
       .procedure-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 15px; }
-      .step-group { padding: 17px; border-radius: 12px; background: #f6f9f7; }
+      .step-group { padding: 8px 17px; border-left: 2px solid #c5d7d1; background: transparent; }
       .step-group h4 { margin: 0 0 11px; font-size: 12px; }
       .step-group ol, .step-group ul { margin: 0; padding-left: 20px; color: #4f625b; font-size: 11px; line-height: 1.8; }
       .step-group li + li { margin-top: 5px; }
@@ -170,6 +187,7 @@
         .app { grid-template-columns: 220px 1fr; }
         .category-grid { grid-template-columns: repeat(2, 1fr); }
         .hero { grid-template-columns: 1fr; }
+        .hero-copy { width: 60%; }
         .status-card { display: grid; grid-template-columns: 1fr 150px 1fr; align-items: center; }
         .status-card > p { margin: 0; }
         .progress-ring { margin: 0; }
@@ -182,9 +200,11 @@
         .overlay.show { display: block; }
         .mobile-menu { display: block; cursor: pointer; }
         .topbar { padding: 0 20px; }
-        .top-actions { display: none; }
+        .top-actions, .identity-pill { display: none; }
         .content { padding: 28px 18px 50px; }
         .hero-main { padding: 31px 26px; min-height: 330px; }
+        .hero-copy { width: 100%; }
+        .orbit-visual { opacity: .18; right: -55px; }
         .hero-main::after { opacity: .5; }
         .status-card { display: block; }
         .status-card > p { margin-bottom: 22px; }
@@ -201,7 +221,7 @@
       <aside class="sidebar" id="sidebar">
         <div class="brand">
           <div class="brand-mark"><span class="brand-dot"></span></div>
-          <div><strong>AMP Lab</strong><small>Atomic & Molecular Physics</small></div>
+          <div><strong>精测 · AMO Lab</strong><small>原子分子物理实验知识库</small></div>
         </div>
         <p class="nav-label">知识库</p>
         <nav class="nav">
@@ -216,8 +236,8 @@
           <button data-action="pending"><span class="nav-icon">⚙</span>字段设置</button>
         </nav>
         <div class="side-note">
-          <strong>资料待补充</strong>
-          <p>首批激光器操作指南已录入。后续将继续补充关键参数、故障排查与安全确认项。</p>
+          <strong>持续整理中</strong>
+          <p>连续光与飞秒激光器操作指南已录入，可继续添加其他设备和实验技巧。</p>
         </div>
       </aside>
       <div class="overlay" id="overlay"></div>
@@ -229,6 +249,7 @@
             <input id="searchInput" type="search" placeholder="搜索实验、仪器、参数或技巧…" />
             <span class="key">⌘ K</span>
           </label>
+          <div class="identity-pill">精测院学生实验手册</div>
           <div class="top-actions">
             <button class="icon-btn" data-action="pending" aria-label="通知">◌</button>
             <button class="icon-btn" data-action="pending" aria-label="帮助">?</button>
@@ -238,13 +259,16 @@
         <div class="content">
           <section class="hero">
             <div class="hero-main">
-              <span class="eyebrow">ATOMIC & MOLECULAR PHYSICS</span>
-              <h1>把实验经验，变成可复用的操作知识。</h1>
-              <p>集中整理原子分子物理实验中的操作流程、仪器调节、参数经验与故障排查，让每一次调试都有迹可循。</p>
-              <div class="hero-actions">
-                <button class="primary" data-target="library">浏览实验库</button>
-                <button class="secondary" data-action="pending">录入一条技巧</button>
+              <div class="hero-copy">
+                <span class="eyebrow">精测院 · ATOMIC & MOLECULAR PHYSICS</span>
+                <h1>原子分子物理实验操作库</h1>
+                <p>面向精密测量物理学习与实验工作的操作记录，集中整理设备启停、光路准直、参数经验与实验技巧。</p>
+                <div class="hero-actions">
+                  <button class="primary" data-target="library">浏览实验库</button>
+                  <button class="secondary" data-action="pending">录入一条技巧</button>
+                </div>
               </div>
+              <div class="orbit-visual" aria-hidden="true"><span class="orbit"></span><span class="orbit"></span><span class="orbit"></span><span class="nucleus"></span><span class="electron one"></span><span class="electron two"></span><span class="electron three"></span><span class="beam"></span></div>
             </div>
             <aside class="status-card">
               <div><h2>知识库完成度</h2><p>已录入首批激光器操作与准直步骤</p></div>
@@ -284,7 +308,7 @@
               <button class="text-btn" data-action="pending">查看全部 →</button>
             </div>
             <div class="library" id="entryList">
-              <article class="entry procedure" data-search="连续光 激光器 AB光 调制 SOF8-409 sigma studio mixer 功率放大器 准直 dataray 干涉条纹 120mA">
+              <article class="entry procedure" data-search="连续光 激光器 AB光 A光 B光 C光 D光 shutter control 红盒按钮 调制 SOF8-409 sigma studio mixer 功率放大器 准直 dataray 干涉条纹 120mA 关机">
                 <span class="entry-num">01</span>
                 <div>
                   <h3>开启连续光激光器（AB光）</h3>
@@ -298,7 +322,8 @@
                         <li>打开激光器，缓慢调高激光器电流至 <strong>120 mA</strong>。</li>
                         <li>检查调频软件 <strong>SigmaStudio</strong>（位于 <strong>mixer</strong> 文件夹），确认右下角连接的是<strong>一号通道</strong>。</li>
                         <li>开启功率放大器的一号、二号通道，分别对应 A 光和 B 光。</li>
-                        <li>打开 AB 光。</li>
+                        <li>确认光路控制方式：A、C、D 光由 <strong>Shutter Control</strong> 控制，B 光由<strong>红盒按钮</strong>控制。</li>
+                        <li>通过对应控制方式打开 A 光和 B 光。</li>
                       </ol></div>
                       <div class="step-group"><h4>AB 光准直</h4><ol>
                         <li>打开 <strong>DataRay</strong>。</li>
@@ -306,12 +331,12 @@
                         <li>远端准直：观察干涉条纹。</li>
                         <li>分别使用近端、远端的镜子调节对应位置的光；“近端/远端”按与光源的距离区分。</li>
                       </ol></div>
-                      <div class="step-group caution"><h4>安全与确认项</h4><ul><li>执行前遵循实验室激光安全规范并确认防护与联锁状态。</li><li class="pending-field">关机顺序、允许功率范围及异常处置待补充。</li></ul></div>
+                      <div class="step-group"><h4>关机</h4><ol><li>按开启顺序反向执行。</li></ol></div>
                     </div>
                   </details>
                 </div>
               </article>
-              <article class="entry procedure" data-search="飞秒 激光器 水冷 空调 转速 650 除湿 温控 laser control 预热 opa 凹透镜 功率计 挡板">
+              <article class="entry procedure" data-search="飞秒 激光器 水冷 空调 风机 转速 650 rpm 除湿 温控 laser control 预热 15 30分钟 opa 凹透镜 功率计 挡板 关机">
                 <span class="entry-num">02</span>
                 <div>
                   <h3>开启飞秒激光器</h3>
@@ -322,8 +347,8 @@
                     <div class="procedure-body">
                       <div class="step-group"><h4>环境与设备准备</h4><ol>
                         <li>确认两台水冷均已开启，空调正常运行。</li>
-                        <li>将转速调至 <strong>650</strong>；需要时开启除湿和温控。</li>
-                        <li>打开 <strong>Laser Control</strong> 进行预热，并完成记录。</li>
+                        <li>将风机转速调至 <strong>650 rpm</strong>；需要时开启除湿和温控。</li>
+                        <li>打开 <strong>Laser Control</strong>，预热 <strong>15～30 分钟</strong>，并完成记录。</li>
                       </ol></div>
                       <div class="step-group"><h4>光路与 OPA</h4><ol>
                         <li>确认凹透镜和功率计安装正常，然后放上挡板。</li>
@@ -331,7 +356,7 @@
                         <li>取下凹透镜和功率计。</li>
                         <li>取下挡板，并完成记录。</li>
                       </ol></div>
-                      <div class="step-group caution"><h4>待确认字段</h4><ul><li class="pending-field">“转速 650”的单位和对应设备待补充。</li><li class="pending-field">预热时长、记录项目及关机顺序待补充。</li><li>移动器件及挡板前遵循实验室激光安全规范。</li></ul></div>
+                      <div class="step-group"><h4>关机</h4><ol><li>按开机顺序反向执行。</li></ol></div>
                     </div>
                   </details>
                 </div>
